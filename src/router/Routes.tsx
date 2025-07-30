@@ -9,6 +9,14 @@ import ErrorPage from "../features/ErrorPage";
 import ServerError from "../errors/ServerError";
 import NotFound from "../errors/NotFound";
 import ShoppingCartPage from "../features/cart/ShoppingCartPage";
+import LoginPage from "../features/account/LoginPage";
+import RegisterPage from "../features/account/RegisterPage";
+import AdminLayout from "../features/admin/AdminLayout";
+import DashboardPage from "../features/admin/ProductsPage";
+import OrdersPage from "../features/admin/OrdersPage";
+import ProductsPage from "../features/admin/ProductsPage";
+import CustomersPage from "../features/admin/CustomersPage";
+import IntegrationPage from "../features/admin/IntegrationPage";
 
 export const router = createBrowserRouter([
   {
@@ -19,12 +27,24 @@ export const router = createBrowserRouter([
       { path: "about", element: <AboutPage /> },
       { path: "contact", element: <ContactPage /> },
       { path: "catalog", element: <CatalogPage /> },
+      { path: "cart", element: <ShoppingCartPage /> },
+      { path: "catalog/:id", element: <ProductDetailsPage /> },
+      { path: "login", element: <LoginPage /> },
+      { path: "register", element: <RegisterPage /> },
       { path: "error", element: <ErrorPage /> },
       { path: "server-error", element: <ServerError /> },
       { path: "not-found", element: <NotFound /> },
-      { path: "cart", element: <ShoppingCartPage /> },
-      { path: "catalog/:id", element: <ProductDetailsPage /> },
       { path: "*", element: <Navigate to={"/not-found"} /> },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [
+      { path: "/admin/products", element: <ProductsPage /> },
+      { path: "/admin/orders", element: <OrdersPage /> },
+      { path: "/admin/customers", element: <CustomersPage /> },
+      { path: "/admin/integration", element: <IntegrationPage /> },
     ],
   },
 ]);

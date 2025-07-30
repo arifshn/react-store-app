@@ -15,9 +15,9 @@ import { useParams } from "react-router";
 import NotFound from "../../errors/NotFound";
 import { LoadingButton } from "@mui/lab";
 import { AddShoppingCart } from "@mui/icons-material";
-import { useAppSelector, useAppDispatch } from "../../hooks/hooks";
 import { addItemToCart } from "../cart/cartSlice";
 import { fetchProductsById, selectProductById } from "./catalogSlice";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
 export default function ProductDetailsPage() {
   const { cart, status } = useAppSelector((state) => state.cart);

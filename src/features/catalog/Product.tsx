@@ -11,8 +11,8 @@ import type { IProduct } from "../../model/IProduct";
 import { AddShoppingCart } from "@mui/icons-material";
 import SearchIcon from "@mui/icons-material/Search";
 import { LoadingButton } from "@mui/lab";
-import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
 import { addItemToCart } from "../cart/cartSlice";
+import { useAppDispatch, useAppSelector } from "../../store/store";
 
 interface Props {
   product: IProduct;

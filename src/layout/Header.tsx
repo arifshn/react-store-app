@@ -10,7 +10,8 @@ import {
   Typography,
 } from "@mui/material";
 import { Link, NavLink } from "react-router";
-import { useAppSelector } from "../hooks/hooks";
+import { logout } from "../features/account/accountSlice";
+import { useAppDispatch, useAppSelector } from "../store/store";
 
 const links = [
   { title: "Home", to: "/" },
@@ -18,6 +19,11 @@ const links = [
   { title: "About", to: "/about" },
   { title: "Contact", to: "/contact" },
   { title: "Error", to: "/error" },
+];
+
+const authLinks = [
+  { title: "Login", to: "/login" },
+  { title: "register", to: "/register" },
 ];
 
 const navStyles = {
@@ -33,6 +39,8 @@ const navStyles = {
 
 function Header() {
   const { cart } = useAppSelector((state) => state.cart);
+  const { user } = useAppSelector((state) => state.account);
+  const dispatch = useAppDispatch();
   const itemCount = cart?.cartItems.reduce(
     (total, item) => total + item.quantity,
     0
@@ -55,7 +63,7 @@ function Header() {
             ))}
           </Stack>
         </Box>
-        <Box>
+        <Box sx={{ display: "flex", alignItems: "center" }}>
           <IconButton
             component={Link}
             to="/cart"
@@ -67,9 +75,31 @@ function Header() {
               <ShoppingCart />
             </Badge>
           </IconButton>
+          {user ? (
+            <Stack direction={"row"}>
+              <Button sx={navStyles}>{user.name}</Button>
+              <Button sx={navStyles} onClick={() => dispatch(logout())}>
+                Çıkış Yap
+              </Button>
+            </Stack>
+          ) : (
+            <Stack direction={"row"}>
+              {authLinks.map((link) => (
+                <Button
+                  key={link.to}
+                  component={NavLink}
+                  to={link.to}
+                  sx={navStyles}
+                >
+                  {link.title}
+                </Button>
+              ))}
+            </Stack>
+          )}
         </Box>
       </Toolbar>
     </AppBar>
   );
 }
+
 export default Header;
