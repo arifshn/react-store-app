@@ -9,7 +9,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../features/account/accountSlice";
 import { useAppDispatch, useAppSelector } from "../store/store";
 
@@ -41,6 +41,7 @@ function Header() {
   const { cart } = useAppSelector((state) => state.cart);
   const { user } = useAppSelector((state) => state.account);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const itemCount = cart?.cartItems.reduce(
     (total, item) => total + item.quantity,
     0
@@ -62,6 +63,25 @@ function Header() {
               </Button>
             ))}
           </Stack>
+          <Stack
+            direction={"row"}
+            spacing={2}
+            alignItems="center"
+            sx={{ marginLeft: "auto" }}
+          >
+            {user?.role === "Admin" && (
+              <Button
+                variant="contained"
+                color="secondary"
+                onClick={() => navigate("/admin")}
+              >
+                Admin Ayarları
+              </Button>
+            )}
+            <Button sx={navStyles} onClick={() => dispatch(logout())}>
+              Çıkış Yap
+            </Button>
+          </Stack>
         </Box>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <IconButton
@@ -75,6 +95,7 @@ function Header() {
               <ShoppingCart />
             </Badge>
           </IconButton>
+
           {user ? (
             <Stack direction={"row"}>
               <Button sx={navStyles}>{user.name}</Button>

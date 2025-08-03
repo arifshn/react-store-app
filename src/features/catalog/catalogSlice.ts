@@ -6,6 +6,7 @@ import {
 import type { IProduct } from "../../model/IProduct";
 import requests from "../../api/requests";
 import type { RootState } from "../../store/store";
+import type { FieldValues } from "react-hook-form";
 
 export const fetchProducts = createAsyncThunk<IProduct[]>(
   "catalog/fetchProducts",
@@ -25,12 +26,51 @@ const productsAdapter = createEntityAdapter<IProduct>();
 const initialState = productsAdapter.getInitialState({
   status: "idle",
   isLoaded: false,
+  selectedProduct: null as IProduct | null,
 });
+
+export const createProduct = createAsyncThunk<IProduct, FieldValues>(
+  "catalog/CreateProduct",
+  async (data, { rejectWithValue }) => {
+    try {
+      return await requests.Catalog.CreateProduct(data);
+    } catch (error: any) {
+      return rejectWithValue({ error: error.data });
+    }
+  }
+);
+
+export const updateProduct = createAsyncThunk<IProduct, FieldValues>(
+  "catalog/UpdateProduct",
+  async (data, { rejectWithValue }) => {
+    try {
+      return await requests.Catalog.UpdateProduct(data);
+    } catch (error: any) {
+      return rejectWithValue({ error: error.data });
+    }
+  }
+);
+
+export const deleteProduct = createAsyncThunk<number, number>(
+  "catalog/DeleteProduct",
+  async (id, { rejectWithValue }) => {
+    try {
+      await requests.Catalog.DeleteProduct(id);
+      return id;
+    } catch (error: any) {
+      return rejectWithValue({ error: error.data });
+    }
+  }
+);
 
 export const catalogSlice = createSlice({
   name: "catalog",
   initialState,
-  reducers: {},
+  reducers: {
+    clearSelectedProduct: (state) => {
+      state.selectedProduct = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchProducts.pending, (state) => {
       state.status = "pendingFetchProducts";
@@ -52,6 +92,17 @@ export const catalogSlice = createSlice({
     });
     builder.addCase(fetchProductsById.rejected, (state) => {
       state.status = "idle";
+    });
+    builder.addCase(createProduct.fulfilled, (state, action) => {
+      productsAdapter.addOne(state, action.payload);
+    });
+
+    builder.addCase(updateProduct.fulfilled, (state, action) => {
+      productsAdapter.upsertOne(state, action.payload);
+    });
+
+    builder.addCase(deleteProduct.fulfilled, (state, action) => {
+      productsAdapter.removeOne(state, action.payload);
     });
   },
 });
