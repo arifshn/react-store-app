@@ -18,8 +18,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import InboxIcon from "@mui/icons-material/MoveToInbox";
 import MailIcon from "@mui/icons-material/Mail";
-import { Typography } from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
+import { useAppDispatch } from "../store/store";
+import { logout } from "../features/account/accountSlice";
 
 const drawerWidth = 240;
 
@@ -97,6 +99,16 @@ interface AdminHeaderProps {
   handleDrawerOpen: () => void;
   handleDrawerClose: () => void;
 }
+const navStyles = {
+  color: "inherit",
+  textDecoration: "none",
+  "&:hover": {
+    color: "error.main",
+  },
+  "&.active": {
+    color: "warning.main",
+  },
+};
 
 export default function AdminHeader({
   open,
@@ -104,7 +116,7 @@ export default function AdminHeader({
   handleDrawerClose,
 }: AdminHeaderProps) {
   const theme = useTheme();
-
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const menuItems = [
@@ -133,6 +145,23 @@ export default function AdminHeader({
           <Typography variant="h6" noWrap component="div">
             Yönetim Paneli
           </Typography>
+          <Stack direction={"row"}></Stack>
+          <Button
+            sx={{
+              ...navStyles,
+              color: "white",
+              border: "1px solid white",
+              paddingX: 2,
+              marginLeft: "auto",
+              "&:hover": {
+                backgroundColor: "error.main",
+                color: "white",
+              },
+            }}
+            onClick={() => dispatch(logout())}
+          >
+            Çıkış Yap
+          </Button>
         </Toolbar>
       </AppBar>
       <Drawer variant="permanent" open={open}>

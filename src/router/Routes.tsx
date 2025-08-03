@@ -12,7 +12,6 @@ import ShoppingCartPage from "../features/cart/ShoppingCartPage";
 import LoginPage from "../features/account/LoginPage";
 import RegisterPage from "../features/account/RegisterPage";
 import AdminLayout from "../features/admin/AdminLayout";
-import DashboardPage from "../features/admin/ProductsPage";
 import OrdersPage from "../features/admin/OrdersPage";
 import ProductsPage from "../features/admin/ProductsPage";
 import CustomersPage from "../features/admin/CustomersPage";

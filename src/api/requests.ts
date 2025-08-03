@@ -2,6 +2,7 @@ import axios, { AxiosError, type AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { router } from "../router/Routes";
 import { store } from "../store/store";
+import type { FieldValues } from "react-hook-form";
 
 axios.defaults.baseURL = "http://localhost:5163/api/";
 axios.defaults.withCredentials = true;
@@ -55,8 +56,10 @@ const queries = {
     axios.post(url, body).then((response: AxiosResponse) => response.data),
   put: (url: string, body: {}) =>
     axios.put(url, body).then((response: AxiosResponse) => response.data),
-  delete: (url: string, body: {}) =>
-    axios.delete(url, body).then((response: AxiosResponse) => response.data),
+  delete: (url: string, body?: {}) =>
+    axios
+      .delete(url, { data: body })
+      .then((response: AxiosResponse) => response.data),
 };
 
 const Errors = {
@@ -70,6 +73,10 @@ const Errors = {
 const Catalog = {
   list: () => queries.get("products"),
   details: (id: number) => queries.get(`products/${id}`),
+  CreateProduct: (data: FieldValues) => queries.post("products", data),
+  UpdateProduct: (data: FieldValues) =>
+    queries.put(`products/${data.id}`, data),
+  DeleteProduct: (id: number) => queries.delete(`products/${id}`),
 };
 
 const Cart = {
