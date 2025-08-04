@@ -16,6 +16,8 @@ import OrdersPage from "../features/admin/OrdersPage";
 import ProductsPage from "../features/admin/ProductsPage";
 import CustomersPage from "../features/admin/CustomersPage";
 import IntegrationPage from "../features/admin/IntegrationPage";
+import CheckoutPage from "../features/checkout/CheckoutPage";
+import AuthGuard from "./AuthGuard";
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +32,10 @@ export const router = createBrowserRouter([
       { path: "catalog/:id", element: <ProductDetailsPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
+      {
+        element: <AuthGuard />,
+        children: [{ path: "checkout", element: <CheckoutPage /> }],
+      },
       { path: "error", element: <ErrorPage /> },
       { path: "server-error", element: <ServerError /> },
       { path: "not-found", element: <NotFound /> },

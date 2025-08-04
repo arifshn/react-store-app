@@ -59,14 +59,6 @@ export default function ProductDetailsPage() {
                 <TableCell>Name</TableCell>
                 <TableCell>{product.name}</TableCell>
               </TableRow>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>{product.name}</TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>{product.name}</TableCell>
-              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

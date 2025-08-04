@@ -1,5 +1,7 @@
 import {
   Alert,
+  Box,
+  Button,
   Paper,
   Table,
   TableBody,
@@ -8,6 +10,7 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+import { Link } from "react-router-dom";
 import {
   AddCircleOutline,
   Delete,
@@ -27,86 +30,100 @@ export default function ShoppingCartPage() {
     return <Alert severity="warning">Sepetinizde Ürün Yok</Alert>;
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }} aria-label="simple table">
-        <TableHead>
-          <TableRow>
-            <TableCell align="right">Fiyat</TableCell>
-            <TableCell align="right">Adet</TableCell>
-            <TableCell align="right">Toplam Fiyat</TableCell>
-            <TableCell align="right"></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {cart?.cartItems.map((item) => (
-            <TableRow
-              key={item.name}
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
-              <TableCell component="th" scope="row">
-                <img
-                  src={`http://localhost:5163/images/${item.imageUrl}`}
-                  style={{ height: 60 }}
-                />
-              </TableCell>
-              <TableCell component="th" scope="row">
-                {item.name}
-              </TableCell>
-              <TableCell align="right">
-                {currencyTRY.format(item.price)}
-              </TableCell>
-              <TableCell align="right">
-                <LoadingButton
-                  loading={status === "pendingAddItem" + item.productId}
-                  onClick={() =>
-                    dispatch(addItemToCart({ productId: item.productId }))
-                  }
-                >
-                  <AddCircleOutline />
-                </LoadingButton>
-                {item.quantity}
-                <LoadingButton
-                  loading={
-                    status === "pendingDeleteItem" + item.productId + "single"
-                  }
-                  onClick={() =>
-                    dispatch(
-                      deleteItemFromCart({
-                        productId: item.productId,
-                        quantity: 1,
-                        key: "single",
-                      })
-                    )
-                  }
-                >
-                  <RemoveCircleOutline />
-                </LoadingButton>
-              </TableCell>
-              <TableCell align="right">{item.price * item.quantity}</TableCell>
-              <TableCell align="right">
-                <LoadingButton
-                  color="error"
-                  loading={
-                    status === "pendingDeleteItem" + item.productId + "all"
-                  }
-                  onClick={() =>
-                    dispatch(
-                      deleteItemFromCart({
-                        productId: item.productId,
-                        quantity: item.quantity,
-                        key: "all",
-                      })
-                    )
-                  }
-                >
-                  <Delete />
-                </LoadingButton>
-              </TableCell>
+    <>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="right">Fiyat</TableCell>
+              <TableCell align="right">Adet</TableCell>
+              <TableCell align="right">Toplam Fiyat</TableCell>
+              <TableCell align="right"></TableCell>
             </TableRow>
-          ))}
-          <CartSummary></CartSummary>
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {cart?.cartItems.map((item) => (
+              <TableRow
+                key={item.name}
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  <img
+                    src={`http://localhost:5163/images/${item.imageUrl}`}
+                    style={{ height: 60 }}
+                  />
+                </TableCell>
+                <TableCell component="th" scope="row">
+                  {item.name}
+                </TableCell>
+                <TableCell align="right">
+                  {currencyTRY.format(item.price)}
+                </TableCell>
+                <TableCell align="right">
+                  <LoadingButton
+                    loading={status === "pendingAddItem" + item.productId}
+                    onClick={() =>
+                      dispatch(addItemToCart({ productId: item.productId }))
+                    }
+                  >
+                    <AddCircleOutline />
+                  </LoadingButton>
+                  {item.quantity}
+                  <LoadingButton
+                    loading={
+                      status === "pendingDeleteItem" + item.productId + "single"
+                    }
+                    onClick={() =>
+                      dispatch(
+                        deleteItemFromCart({
+                          productId: item.productId,
+                          quantity: 1,
+                          key: "single",
+                        })
+                      )
+                    }
+                  >
+                    <RemoveCircleOutline />
+                  </LoadingButton>
+                </TableCell>
+                <TableCell align="right">
+                  {item.price * item.quantity}
+                </TableCell>
+                <TableCell align="right">
+                  <LoadingButton
+                    color="error"
+                    loading={
+                      status === "pendingDeleteItem" + item.productId + "all"
+                    }
+                    onClick={() =>
+                      dispatch(
+                        deleteItemFromCart({
+                          productId: item.productId,
+                          quantity: item.quantity,
+                          key: "all",
+                        })
+                      )
+                    }
+                  >
+                    <Delete />
+                  </LoadingButton>
+                </TableCell>
+              </TableRow>
+            ))}
+            <CartSummary></CartSummary>
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box display="flex" justifyContent="flex-end" sx={{ mt: 3 }}>
+        <Button
+          component={Link}
+          to="/checkout"
+          variant="contained"
+          color="primary"
+        >
+          Ödeme Yap
+        </Button>
+      </Box>
+    </>
   );
 }

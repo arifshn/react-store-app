@@ -1,29 +1,32 @@
+import * as React from "react";
 import { ShoppingCart } from "@mui/icons-material";
 import {
   AppBar,
   Badge,
   Box,
   Button,
+  CssBaseline,
+  Divider,
+  Drawer,
   IconButton,
-  Stack,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
   Toolbar,
   Typography,
 } from "@mui/material";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import MenuIcon from "@mui/icons-material/Menu";
 import { logout } from "../features/account/accountSlice";
-import { useAppDispatch, useAppSelector } from "../store/store";
+import { useAppSelector, useAppDispatch } from "../store/store";
+import { clearCart } from "../features/cart/cartSlice";
 
 const links = [
-  { title: "Home", to: "/" },
-  { title: "Catalog", to: "/catalog" },
-  { title: "About", to: "/about" },
-  { title: "Contact", to: "/contact" },
-  { title: "Error", to: "/error" },
-];
-
-const authLinks = [
-  { title: "Login", to: "/login" },
-  { title: "register", to: "/register" },
+  { title: "Katalog", to: "/catalog" },
+  { title: "Hakkında", to: "/about" },
+  { title: "İletişim", to: "/contact" },
+  { title: "Hata Test", to: "/error" },
 ];
 
 const navStyles = {
@@ -35,9 +38,12 @@ const navStyles = {
   "&.active": {
     color: "warning.main",
   },
+  typography: "body1",
 };
 
-function Header() {
+const drawerWidth = 240;
+
+export default function Header() {
   const { cart } = useAppSelector((state) => state.cart);
   const { user } = useAppSelector((state) => state.account);
   const dispatch = useAppDispatch();
@@ -46,81 +52,204 @@ function Header() {
     (total, item) => total + item.quantity,
     0
   );
-  return (
-    <AppBar position="static" sx={{ mb: 4 }}>
-      <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography variant="h6"></Typography>
-          <Stack direction={"row"}>
-            {links.map((link) => (
-              <Button
-                key={link.to}
+
+  const [mobileOpen, setMobileOpen] = React.useState(false);
+
+  const handleDrawerToggle = () => {
+    setMobileOpen((prevState) => !prevState);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+    dispatch(clearCart());
+  };
+
+  const drawer = (
+    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
+      <Typography variant="h6" sx={{ my: 2 }}>
+        CALMORA
+      </Typography>
+      <Divider />
+      <List>
+        <ListItem disablePadding>
+          <ListItemButton
+            sx={{ textAlign: "center" }}
+            component={NavLink}
+            to="/"
+          >
+            <ListItemText primary="Ana Sayfa" />
+          </ListItemButton>
+        </ListItem>
+        {links.map((item) => (
+          <ListItem key={item.title} disablePadding>
+            <ListItemButton
+              sx={{ textAlign: "center" }}
+              component={NavLink}
+              to={item.to}
+            >
+              <ListItemText primary={item.title} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+      <Divider />
+      <List>
+        {user ? (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ textAlign: "center" }}
                 component={NavLink}
-                to={link.to}
+                to="/admin"
+              >
+                <ListItemText primary="Admin Paneli" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ textAlign: "center" }}
+                onClick={handleLogout}
+              >
+                <ListItemText primary="Çıkış Yap" />
+              </ListItemButton>
+            </ListItem>
+          </>
+        ) : (
+          <>
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ textAlign: "center" }}
+                component={NavLink}
+                to="/login"
+              >
+                <ListItemText primary="Giriş Yap" />
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ textAlign: "center" }}
+                component={NavLink}
+                to="/register"
+              >
+                <ListItemText primary="Kayıt Ol" />
+              </ListItemButton>
+            </ListItem>
+          </>
+        )}
+      </List>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <AppBar position="sticky" sx={{ boxShadow: 3 }}>
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            height: "64px",
+            padding: "0 24px",
+            backgroundColor: "#333",
+          }}
+        >
+          <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            edge="start"
+            onClick={handleDrawerToggle}
+            sx={{ display: { sm: "none" } }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography
+            variant="h6"
+            component={NavLink}
+            to="/"
+            sx={{
+              textDecoration: "none",
+              color: "inherit",
+              fontWeight: "bold",
+              letterSpacing: 2,
+              ml: { xs: 0, sm: 2 },
+            }}
+          >
+            CALMORA
+          </Typography>
+
+          <Box
+            sx={{
+              display: { xs: "none", sm: "flex" },
+              alignItems: "center",
+              gap: 2,
+              ml: 4,
+            }}
+          >
+            {links.map((item) => (
+              <Button
+                component={NavLink}
+                to={item.to}
+                key={item.title}
                 sx={navStyles}
               >
-                {link.title}
+                {item.title}
               </Button>
             ))}
-          </Stack>
-          <Stack
-            direction={"row"}
-            spacing={2}
-            alignItems="center"
-            sx={{ marginLeft: "auto" }}
-          >
-            {user?.role === "Admin" && (
-              <Button
-                variant="contained"
-                color="secondary"
-                onClick={() => navigate("/admin")}
-              >
-                Admin Ayarları
-              </Button>
-            )}
-            <Button sx={navStyles} onClick={() => dispatch(logout())}>
-              Çıkış Yap
-            </Button>
-          </Stack>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <IconButton
-            component={Link}
-            to="/cart"
-            size="large"
-            edge="start"
-            color="inherit"
-          >
-            <Badge badgeContent={itemCount} color="secondary">
-              <ShoppingCart />
-            </Badge>
-          </IconButton>
 
-          {user ? (
-            <Stack direction={"row"}>
-              <Button sx={navStyles}>{user.name}</Button>
-              <Button sx={navStyles} onClick={() => dispatch(logout())}>
-                Çıkış Yap
-              </Button>
-            </Stack>
-          ) : (
-            <Stack direction={"row"}>
-              {authLinks.map((link) => (
-                <Button
-                  key={link.to}
-                  component={NavLink}
-                  to={link.to}
-                  sx={navStyles}
-                >
-                  {link.title}
+            {user ? (
+              <>
+                <Button component={NavLink} to="/admin" sx={navStyles}>
+                  Admin Paneli
                 </Button>
-              ))}
-            </Stack>
-          )}
-        </Box>
-      </Toolbar>
-    </AppBar>
+                <Button onClick={handleLogout} sx={navStyles}>
+                  Çıkış Yap
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button component={NavLink} to="/login" sx={navStyles}>
+                  Giriş Yap
+                </Button>
+                <Button component={NavLink} to="/register" sx={navStyles}>
+                  Kayıt Ol
+                </Button>
+              </>
+            )}
+          </Box>
+          <Box sx={{ display: "flex", alignItems: "center", ml: "auto" }}>
+            <IconButton
+              component={NavLink}
+              to="/cart"
+              size="large"
+              sx={{ color: "inherit" }}
+            >
+              <Badge badgeContent={itemCount} color="secondary">
+                <ShoppingCart />
+              </Badge>
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <nav>
+        <Drawer
+          variant="temporary"
+          open={mobileOpen}
+          onClose={handleDrawerToggle}
+          ModalProps={{
+            keepMounted: true,
+          }}
+          sx={{
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
+              width: drawerWidth,
+            },
+          }}
+        >
+          {drawer}
+        </Drawer>
+      </nav>
+    </Box>
   );
 }
-
-export default Header;
