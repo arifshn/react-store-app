@@ -93,11 +93,28 @@ const Account = {
   getUser: () => queries.get("account/getUser"),
 };
 
+const Order = {
+  getOrders: () => queries.get("orders"),
+  getOrder: (id: number) => queries.get(`orders/${id}`),
+  createOrder: (formData: any) => queries.post("orders", formData),
+};
+
+const categories = {
+  getCategorys: () => queries.get("category"),
+  getCategory: (id: number) => queries.get(`category/${id}`),
+  CreateCategory: (data: FieldValues) => queries.post("category", data),
+  UpdateCategory: (data: FieldValues) =>
+    queries.put(`category/${data.id}`, data),
+  DeleteCategory: (id: number) => queries.delete(`category/${id}`),
+};
+
 const requests = {
   Catalog,
   Errors,
   Cart,
   Account,
+  Order,
+  categories,
 };
 
 export default requests;

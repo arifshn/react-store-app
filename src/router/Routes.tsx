@@ -14,10 +14,11 @@ import RegisterPage from "../features/account/RegisterPage";
 import AdminLayout from "../features/admin/AdminLayout";
 import OrdersPage from "../features/admin/OrdersPage";
 import ProductsPage from "../features/admin/ProductsPage";
-import CustomersPage from "../features/admin/CustomersPage";
 import IntegrationPage from "../features/admin/IntegrationPage";
 import CheckoutPage from "../features/checkout/CheckoutPage";
 import AuthGuard from "./AuthGuard";
+import OrderList from "../features/orders/OrderList";
+import CategoriesPage from "../features/admin/CategoriesPage";
 
 export const router = createBrowserRouter([
   {
@@ -34,7 +35,10 @@ export const router = createBrowserRouter([
       { path: "register", element: <RegisterPage /> },
       {
         element: <AuthGuard />,
-        children: [{ path: "checkout", element: <CheckoutPage /> }],
+        children: [
+          { path: "checkout", element: <CheckoutPage /> },
+          { path: "orders", element: <OrderList /> },
+        ],
       },
       { path: "error", element: <ErrorPage /> },
       { path: "server-error", element: <ServerError /> },
@@ -48,7 +52,7 @@ export const router = createBrowserRouter([
     children: [
       { path: "/admin/products", element: <ProductsPage /> },
       { path: "/admin/orders", element: <OrdersPage /> },
-      { path: "/admin/customers", element: <CustomersPage /> },
+      { path: "/admin/categories", element: <CategoriesPage /> },
       { path: "/admin/integration", element: <IntegrationPage /> },
     ],
   },

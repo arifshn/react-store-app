@@ -16,6 +16,10 @@ import Review from "./Review";
 import { useState } from "react";
 import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
 import { FormProvider, useForm, type FieldValues } from "react-hook-form";
+import requests from "../../api/requests";
+import { useAppDispatch } from "../../store/store";
+import { clearCart } from "../cart/cartSlice";
+import { LoadingButton } from "@mui/lab";
 
 const steps = ["Teslimat Bilgileri", "Ödeme", "Sipariş Özeti"];
 
@@ -35,10 +39,25 @@ function getStepContent(step: number) {
 export default function CheckoutPage() {
   const [activeStep, setActiveStep] = useState(0);
   const methods = useForm();
+  const [orderId, setOrderId] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const dispatch = useAppDispatch();
 
-  function handleNext(data: FieldValues) {
-    console.log(data);
-    setActiveStep(activeStep + 1);
+  async function handleNext(data: FieldValues) {
+    if (activeStep === 2) {
+      setLoading(true);
+      try {
+        setOrderId(await requests.Order.createOrder(data));
+        setActiveStep(activeStep + 1);
+        dispatch(clearCart());
+        setLoading(false);
+      } catch (error: any) {
+        console.log(error);
+        setLoading(false);
+      }
+    } else {
+      setActiveStep(activeStep + 1);
+    }
   }
 
   function handlePrevious() {
@@ -48,17 +67,20 @@ export default function CheckoutPage() {
     <FormProvider {...methods}>
       <Paper>
         <Grid container spacing={4}>
-          <Grid
-            size={4}
-            sx={{
-              borderRight: "1px solid",
-              borderColor: "divider",
-              p: 3,
-            }}
-          >
-            <Info />
-          </Grid>
-          <Grid size={8} sx={{ p: 3 }}>
+          {activeStep !== steps.length && (
+            <Grid
+              size={4}
+              sx={{
+                borderRight: "1px solid",
+                borderColor: "divider",
+                p: 3,
+              }}
+            >
+              <Info />
+            </Grid>
+          )}
+
+          <Grid size={activeStep !== steps.length ? 8 : 12} sx={{ p: 3 }}>
             <Box>
               <Stepper activeStep={activeStep} sx={{ height: 40, mb: 4 }}>
                 {steps.map((label) => (
@@ -76,7 +98,7 @@ export default function CheckoutPage() {
                     Teşekkür Ederiz. Siparişinizi Aldık
                   </Typography>
                   <Typography variant="body1" sx={{ color: "text.secondary" }}>
-                    Sipariş Numaranız <strong>#12345</strong>. Siparişiniz
+                    Sipariş Numaranız <strong>#{orderId}</strong>. Siparişiniz
                     onaylandığında size bir eposta göndereceğiz.
                   </Typography>
                   <Button
@@ -110,13 +132,14 @@ export default function CheckoutPage() {
                           Geri
                         </Button>
                       )}
-                      <Button
+                      <LoadingButton
                         type="submit"
+                        loading={loading}
                         startIcon={<ChevronRightRounded />}
                         variant="contained"
                       >
-                        İleri
-                      </Button>
+                        {activeStep == 2 ? "Siparişi Tamamla" : "İleri"}
+                      </LoadingButton>
                     </Box>
                   </Box>
                 </form>
