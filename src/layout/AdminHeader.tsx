@@ -123,7 +123,7 @@ export default function AdminHeader({
     { text: "Anasayfa", path: "/admin" },
     { text: "Siparişler", path: "/admin/orders" },
     { text: "Ürünler", path: "/admin/products" },
-    { text: "Müşteriler", path: "/admin/customers" },
+    { text: "Kategoriler", path: "/admin/categories" },
     { text: "Entegrasyon", path: "/admin/integration" },
   ];
   return (

@@ -11,6 +11,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Button } from "@mui/material";
 import ProductForm from "./ProductForm";
+import type { IProduct } from "../../model/IProduct";
 
 export default function ProductsPage() {
   const dispatch = useAppDispatch();
@@ -64,7 +65,7 @@ export default function ProductsPage() {
     setOpenForm(false);
   };
 
-  const columns: GridColDef[] = [
+  const columns: GridColDef<IProduct>[] = [
     { field: "id", headerName: "ID", width: 90 },
     { field: "name", headerName: "Ürün Adı", width: 200 },
     { field: "price", headerName: "Fiyat", width: 120 },
@@ -72,6 +73,12 @@ export default function ProductsPage() {
     { field: "description", headerName: "Açıklama", width: 120 },
     { field: "imageUrl", headerName: "Görsel", width: 120 },
     { field: "isActive", headerName: "Aktif", width: 120 },
+    {
+      field: "category",
+      headerName: "Kategori",
+      width: 150,
+      renderCell: (params) => params.value?.kategoriAdi ?? "Belirtilmemiş",
+    },
     {
       field: "actions",
       headerName: "İşlemler",

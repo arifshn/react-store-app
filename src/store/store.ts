@@ -3,12 +3,14 @@ import { cartSlice } from "../features/cart/cartSlice";
 import { catalogSlice } from "../features/catalog/catalogSlice";
 import { accountSlice } from "../features/account/accountSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { categoriesSlice } from "../features/categories/categoriesSlice";
 
 export const store = configureStore({
   reducer: {
     cart: cartSlice.reducer,
     catalog: catalogSlice.reducer,
     account: accountSlice.reducer,
+    categories: categoriesSlice.reducer,
   },
 });
 

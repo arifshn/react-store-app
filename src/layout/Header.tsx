@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ShoppingCart } from "@mui/icons-material";
+import { ShoppingCart, KeyboardArrowDown } from "@mui/icons-material";
 import {
   AppBar,
   Badge,
@@ -13,10 +13,12 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
+  Menu,
+  MenuItem,
   Toolbar,
   Typography,
 } from "@mui/material";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import { logout } from "../features/account/accountSlice";
 import { useAppSelector, useAppDispatch } from "../store/store";
@@ -54,14 +56,26 @@ export default function Header() {
   );
 
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);
   };
 
+  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
   const handleLogout = () => {
     dispatch(logout());
     dispatch(clearCart());
+    handleMenuClose();
+    navigate("/");
   };
 
   const drawer = (
@@ -100,11 +114,22 @@ export default function Header() {
               <ListItemButton
                 sx={{ textAlign: "center" }}
                 component={NavLink}
-                to="/admin"
+                to="/orders"
               >
-                <ListItemText primary="Admin Paneli" />
+                <ListItemText primary="Siparişlerim" />
               </ListItemButton>
             </ListItem>
+            {user.role === "Admin" && (
+              <ListItem disablePadding>
+                <ListItemButton
+                  sx={{ textAlign: "center" }}
+                  component={NavLink}
+                  to="/admin"
+                >
+                  <ListItemText primary="Admin Paneli" />
+                </ListItemButton>
+              </ListItem>
+            )}
             <ListItem disablePadding>
               <ListItemButton
                 sx={{ textAlign: "center" }}
@@ -196,28 +221,16 @@ export default function Header() {
                 {item.title}
               </Button>
             ))}
-
-            {user ? (
-              <>
-                <Button component={NavLink} to="/admin" sx={navStyles}>
-                  Admin Paneli
-                </Button>
-                <Button onClick={handleLogout} sx={navStyles}>
-                  Çıkış Yap
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button component={NavLink} to="/login" sx={navStyles}>
-                  Giriş Yap
-                </Button>
-                <Button component={NavLink} to="/register" sx={navStyles}>
-                  Kayıt Ol
-                </Button>
-              </>
-            )}
           </Box>
-          <Box sx={{ display: "flex", alignItems: "center", ml: "auto" }}>
+
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 2,
+              ml: "auto",
+            }}
+          >
             <IconButton
               component={NavLink}
               to="/cart"
@@ -228,6 +241,44 @@ export default function Header() {
                 <ShoppingCart />
               </Badge>
             </IconButton>
+
+            <Box sx={{ display: { xs: "none", sm: "flex" } }}>
+              {user ? (
+                <>
+                  <Button
+                    onClick={handleMenuClick}
+                    endIcon={<KeyboardArrowDown />}
+                    sx={navStyles}
+                  >
+                    {user.name}
+                  </Button>
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={open}
+                    onClose={handleMenuClose}
+                  >
+                    <MenuItem component={Link} to="/orders">
+                      Siparişlerim
+                    </MenuItem>
+                    {user.role === "admin" && (
+                      <MenuItem onClick={() => navigate("/admin")}>
+                        Admin Paneli
+                      </MenuItem>
+                    )}
+                    <MenuItem onClick={handleLogout}>Çıkış Yap</MenuItem>
+                  </Menu>
+                </>
+              ) : (
+                <>
+                  <Button component={NavLink} to="/login" sx={navStyles}>
+                    Giriş Yap
+                  </Button>
+                  <Button component={NavLink} to="/register" sx={navStyles}>
+                    Kayıt Ol
+                  </Button>
+                </>
+              )}
+            </Box>
           </Box>
         </Toolbar>
       </AppBar>
