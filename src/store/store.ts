@@ -4,6 +4,7 @@ import { catalogSlice } from "../features/catalog/catalogSlice";
 import { accountSlice } from "../features/account/accountSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { categoriesSlice } from "../features/categories/categoriesSlice";
+import { orderSlice } from "../features/orders/orderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     catalog: catalogSlice.reducer,
     account: accountSlice.reducer,
     categories: categoriesSlice.reducer,
+    order: orderSlice.reducer,
   },
 });
 

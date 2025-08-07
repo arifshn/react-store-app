@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Button } from "@mui/material";
 import ProductForm from "./ProductForm";
 import type { IProduct } from "../../model/IProduct";
+import { fetchCategories } from "../categories/categoriesSlice";
 
 export default function ProductsPage() {
   const dispatch = useAppDispatch();
@@ -27,6 +28,7 @@ export default function ProductsPage() {
   useEffect(() => {
     if (!isLoaded) {
       dispatch(fetchProducts());
+      dispatch(fetchCategories());
     }
   }, [dispatch, isLoaded]);
 

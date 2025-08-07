@@ -10,7 +10,13 @@ import {
   TextField,
   FormControlLabel,
   Checkbox,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  type SelectChangeEvent,
 } from "@mui/material";
+import { selectAllCategories } from "../categories/categoriesSlice";
 
 interface ProductFormProps {
   productId: number | null;
@@ -26,6 +32,7 @@ export default function ProductForm({
   const product = useAppSelector((state) =>
     productId ? selectProductById(state, productId) : null
   );
+  const categories = useAppSelector(selectAllCategories);
 
   const [formState, setFormState] = useState({
     id: product?.id ?? 0,
@@ -35,6 +42,7 @@ export default function ProductForm({
     description: product?.description ?? "",
     imageUrl: product?.imageUrl ?? "",
     isActive: product?.isActive ?? true,
+    categoryId: product?.categoryID ?? "",
   });
 
   useEffect(() => {
@@ -47,20 +55,39 @@ export default function ProductForm({
         description: product.description,
         imageUrl: product.imageUrl,
         isActive: product.isActive,
+        categoryId: product.categoryID ?? "",
       });
     }
   }, [product]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormState((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+  const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({
+      ...prev,
+      categoryId: Number(e.target.value) || "",
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = () => {
-    onSubmit(formState);
+    const { id, ...dataToSend } = formState;
+    const finalData = {
+      id,
+      ...dataToSend,
+      price: Number(dataToSend.price),
+      stock: Number(dataToSend.stock),
+      categoryId: Number(dataToSend.categoryId),
+    };
+    console.log("Gönderilen formState id:", formState);
+    console.log("Gönderilen veri:", finalData);
+    onSubmit(finalData);
   };
 
   return (
@@ -75,7 +102,7 @@ export default function ProductForm({
           label="Ürün Adı"
           name="name"
           value={formState.name}
-          onChange={handleChange}
+          onChange={handleInputChange}
         />
         <TextField
           fullWidth
@@ -84,7 +111,7 @@ export default function ProductForm({
           name="price"
           type="number"
           value={formState.price}
-          onChange={handleChange}
+          onChange={handleInputChange}
         />
         <TextField
           fullWidth
@@ -93,7 +120,7 @@ export default function ProductForm({
           name="stock"
           type="number"
           value={formState.stock}
-          onChange={handleChange}
+          onChange={handleInputChange}
         />
         <TextField
           fullWidth
@@ -101,7 +128,7 @@ export default function ProductForm({
           label="Açıklama"
           name="description"
           value={formState.description}
-          onChange={handleChange}
+          onChange={handleInputChange}
         />
         <TextField
           fullWidth
@@ -109,13 +136,30 @@ export default function ProductForm({
           label="Görsel URL"
           name="imageUrl"
           value={formState.imageUrl}
-          onChange={handleChange}
+          onChange={handleInputChange}
         />
+        <FormControl fullWidth margin="normal">
+          <InputLabel>Kategori</InputLabel>
+          <Select
+            label="kategori"
+            name="categoryId"
+            value={formState.categoryId ?? ""}
+            onChange={handleSelectChange}
+          >
+            {categories.map((category) => {
+              return (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.kategoriAdi}
+                </MenuItem>
+              );
+            })}
+          </Select>
+        </FormControl>
         <FormControlLabel
           control={
             <Checkbox
               checked={formState.isActive}
-              onChange={handleChange}
+              onChange={handleInputChange}
               name="isActive"
             />
           }
