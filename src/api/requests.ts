@@ -74,8 +74,11 @@ const Catalog = {
   list: () => queries.get("products"),
   details: (id: number) => queries.get(`products/${id}`),
   CreateProduct: (data: FieldValues) => queries.post("products", data),
-  UpdateProduct: (data: FieldValues) =>
-    queries.put(`products/${data.id}`, data),
+  UpdateProduct: (data: FieldValues) => {
+    console.log("UpdateProduct data:", data);
+    console.log("UpdateProduct id:", data.id);
+    return queries.put(`products/${data.id}`, data);
+  },
   DeleteProduct: (id: number) => queries.delete(`products/${id}`),
 };
 

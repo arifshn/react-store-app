@@ -44,6 +44,8 @@ export const updateProduct = createAsyncThunk<IProduct, FieldValues>(
   "catalog/UpdateProduct",
   async (data, { rejectWithValue }) => {
     try {
+      console.log("updateProduct data:", data);
+      console.log("updateProduct id:", data.id);
       return await requests.Catalog.UpdateProduct(data);
     } catch (error: any) {
       return rejectWithValue({ error: error.data });
@@ -98,7 +100,14 @@ export const catalogSlice = createSlice({
     });
 
     builder.addCase(updateProduct.fulfilled, (state, action) => {
-      productsAdapter.upsertOne(state, action.payload);
+      if (action.payload && action.payload.id !== undefined) {
+        productsAdapter.upsertOne(state, action.payload);
+      } else {
+        console.warn(
+          "updateProduct.fulfilled: id yok veya undefined",
+          action.payload
+        );
+      }
     });
 
     builder.addCase(deleteProduct.fulfilled, (state, action) => {
