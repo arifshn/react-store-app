@@ -1,25 +1,25 @@
 import { createBrowserRouter, Navigate } from "react-router";
 import App from "../layout/App";
-import HomePage from "../features/HomePage";
-import AboutPage from "../features/AboutPage";
-import ContactPage from "../features/ContactPage";
-import CatalogPage from "../features/catalog/CatalogPage";
-import ProductDetailsPage from "../features/catalog/ProductDetailsPage";
-import ErrorPage from "../features/ErrorPage";
+import HomePage from "../features/pages/HomePage";
+import AboutPage from "../features/pages/AboutPage";
+import ContactPage from "../features/pages/ContactPage";
+import ErrorPage from "../features/pages/ErrorPage";
 import ServerError from "../errors/ServerError";
 import NotFound from "../errors/NotFound";
-import ShoppingCartPage from "../features/cart/ShoppingCartPage";
-import LoginPage from "../features/account/LoginPage";
-import RegisterPage from "../features/account/RegisterPage";
-import AdminLayout from "../features/admin/AdminLayout";
-import OrdersPage from "../features/admin/OrdersPage";
-import ProductsPage from "../features/admin/ProductsPage";
-import IntegrationPage from "../features/admin/IntegrationPage";
-import CheckoutPage from "../features/checkout/CheckoutPage";
+import ShoppingCartPage from "../features/cart/pages/ShoppingCartPage";
+import RegisterPage from "../features/account/pages/RegisterPage";
+import ProductsPage from "../features/admin/pages/ProductsPage";
+import IntegrationPage from "../features/admin/pages/IntegrationPage";
+import CheckoutPage from "../features/checkout/pages/CheckoutPage";
 import AuthGuard from "./AuthGuard";
-import OrderList from "../features/orders/OrderList";
-import CategoriesPage from "../features/admin/CategoriesPage";
-import FavoritePage from "../features/favorite/FavoritePage";
+import OrderList from "../features/orders/pages/OrderList";
+import CategoriesPage from "../features/admin/pages/CategoriesPage";
+import FavoritePage from "../features/favorite/pages/FavoritePage";
+import CatalogPage from "../features/catalog/pages/CatalogPage";
+import ProductDetailsPage from "../features/catalog/pages/ProductDetailsPage";
+import LoginPage from "../features/account/pages/LoginPage";
+import AdminLayout from "../features/admin/pages/AdminLayout";
+import OrdersPage from "../features/admin/pages/OrdersPage";
 
 export const router = createBrowserRouter([
   {

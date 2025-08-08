@@ -11,9 +11,9 @@ import { Outlet } from "react-router";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useAppDispatch } from "../store/store";
-import { getCart } from "../features/cart/cartSlice";
+import { getCart } from "../features/cart/slices/cartSlice";
 import Header from "./Header";
-import { getUser } from "../features/account/accountSlice";
+import { getUser } from "../features/account/slices/accountSlice";
 import React from "react";
 
 function App() {

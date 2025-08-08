@@ -31,9 +31,9 @@ import {
   Typography,
 } from "@mui/material";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { logout } from "../features/account/accountSlice";
+import { logout } from "../features/account/slices/accountSlice";
 import { useAppSelector, useAppDispatch } from "../store/store";
-import { clearCart } from "../features/cart/cartSlice";
+import { clearCart } from "../features/cart/slices/cartSlice";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 const links = [
