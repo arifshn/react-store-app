@@ -21,7 +21,7 @@ import MailIcon from "@mui/icons-material/Mail";
 import { Button, Stack, Typography } from "@mui/material";
 import { useNavigate } from "react-router";
 import { useAppDispatch } from "../store/store";
-import { logout } from "../features/account/accountSlice";
+import { logout } from "../features/account/slices/accountSlice";
 
 const drawerWidth = 240;
 

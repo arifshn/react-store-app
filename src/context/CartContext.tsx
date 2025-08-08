@@ -4,7 +4,7 @@ import {
   useState,
   type PropsWithChildren,
 } from "react";
-import type { Cart } from "../model/ICart";
+import type { Cart } from "../features/cart/models/ICart";
 
 interface CartContextValue {
   cart: Cart | null;
