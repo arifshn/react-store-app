@@ -19,6 +19,7 @@ import CheckoutPage from "../features/checkout/CheckoutPage";
 import AuthGuard from "./AuthGuard";
 import OrderList from "../features/orders/OrderList";
 import CategoriesPage from "../features/admin/CategoriesPage";
+import FavoritePage from "../features/favorite/FavoritePage";
 
 export const router = createBrowserRouter([
   {
@@ -33,6 +34,7 @@ export const router = createBrowserRouter([
       { path: "catalog/:id", element: <ProductDetailsPage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
+      { path: "favorities", element: <FavoritePage /> },
       {
         element: <AuthGuard />,
         children: [

@@ -5,6 +5,7 @@ import { accountSlice } from "../features/account/accountSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { categoriesSlice } from "../features/categories/categoriesSlice";
 import { orderSlice } from "../features/orders/orderSlice";
+import { favoritiesSlice } from "../features/favorite/favoriteSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     account: accountSlice.reducer,
     categories: categoriesSlice.reducer,
     order: orderSlice.reducer,
+    favorities: favoritiesSlice.reducer,
   },
 });
 

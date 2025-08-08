@@ -6,12 +6,12 @@ import {
   Paper,
   TextField,
   Typography,
+  Link,
 } from "@mui/material";
 import { useForm, type FieldValues } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
-
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import { loginUser } from "./accountSlice";
-import { useLocation, useNavigate } from "react-router";
 import { useAppDispatch } from "../../store/store";
 import { getCart } from "../cart/cartSlice";
 
@@ -19,6 +19,7 @@ export default function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
   const {
     register,
     handleSubmit,
@@ -29,36 +30,47 @@ export default function LoginPage() {
       password: "",
     },
   });
+
   async function submitForm(data: FieldValues) {
-    await dispatch(loginUser(data));
-    await dispatch(getCart());
-    navigate(location.state?.from || "/catalog");
+    try {
+      await dispatch(loginUser(data));
+      await dispatch(getCart());
+      navigate(location.state?.from || "/catalog");
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   }
 
-  console.log(errors);
-
   return (
-    <Container maxWidth="xs">
-      <Paper sx={{ marginTop: 8, padding: 2 }} elevation={5}>
+    <Container component="main" maxWidth="xs">
+      <Paper
+        sx={{
+          marginTop: 8,
+          padding: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          borderRadius: 2,
+        }}
+        elevation={3}
+      >
         <Avatar
           sx={{
-            mx: "auto",
-            color: "secondary.main",
-            textAlign: "center",
-            mb: 1,
-            backgroundColor: "primary",
+            m: 1,
+            bgcolor: "primary.main",
           }}
         >
-          <LockOutlined></LockOutlined>
+          <LockOutlined />
         </Avatar>
-        <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
+        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
           Giriş Yap
         </Typography>
+
         <Box
           component="form"
           onSubmit={handleSubmit(submitForm)}
           noValidate
-          sx={{ mt: 2 }}
+          sx={{ mt: 1 }}
         >
           <TextField
             {...register("username", {
@@ -67,12 +79,11 @@ export default function LoginPage() {
             size="small"
             label="Kullanıcı Adı Giriniz"
             fullWidth
-            required
+            margin="normal"
             autoFocus
-            sx={{ mb: 2 }}
             error={!!errors.username}
             helperText={errors.username?.message}
-          ></TextField>
+          />
           <TextField
             {...register("password", {
               required: "Parola boş olamaz",
@@ -82,21 +93,25 @@ export default function LoginPage() {
             label="Parola Giriniz"
             type="password"
             fullWidth
-            required
-            sx={{ mb: 2 }}
+            margin="normal"
             error={!!errors.password}
             helperText={errors.password?.message}
-          ></TextField>
+          />
           <LoadingButton
             disabled={!isValid}
             loading={isSubmitting}
             type="submit"
             variant="contained"
             fullWidth
-            sx={{ mt: 1 }}
+            sx={{ mt: 3, mb: 2 }}
           >
             Giriş Yap
           </LoadingButton>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            <Link component={RouterLink} to="/register" variant="body2">
+              {"Hesabınız yok mu? Kayıt Olun"}
+            </Link>
+          </Box>
         </Box>
       </Paper>
     </Container>

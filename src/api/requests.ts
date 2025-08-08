@@ -111,6 +111,12 @@ const categories = {
   DeleteCategory: (id: number) => queries.delete(`category/${id}`),
 };
 
+const favorities = {
+  GetFavorities: () => queries.get("favorities"),
+  AddFavorite: (formData: any) => queries.post("favorities", formData),
+  DeleteFavorite: (id: number) => queries.delete(`favorities/${id}`),
+};
+
 const requests = {
   Catalog,
   Errors,
@@ -118,6 +124,7 @@ const requests = {
   Account,
   Order,
   categories,
+  favorities,
 };
 
 export default requests;

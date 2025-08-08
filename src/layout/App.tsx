@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Box, CircularProgress, CssBaseline, Typography } from "@mui/material";
+import {
+  Box,
+  CircularProgress,
+  createTheme,
+  CssBaseline,
+  ThemeProvider,
+  Typography,
+} from "@mui/material";
 import { Outlet } from "react-router";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -7,10 +14,21 @@ import { useAppDispatch } from "../store/store";
 import { getCart } from "../features/cart/cartSlice";
 import Header from "./Header";
 import { getUser } from "../features/account/accountSlice";
+import React from "react";
 
 function App() {
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
+  const [mode, setMode] = React.useState<"light" | "dark">("light");
+
+  const theme = createTheme({
+    palette: {
+      mode: mode,
+    },
+  });
+  const handleThemeChange = () => {
+    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
+  };
 
   const initApp = async () => {
     await dispatch(getUser());
@@ -41,12 +59,18 @@ function App() {
   }
   return (
     <>
-      <CssBaseline />
-      <ToastContainer position="bottom-right" hideProgressBar theme="colored" />
-      <Header />
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
-        <Outlet />
-      </Box>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Header onThemeChange={handleThemeChange} />
+        <ToastContainer
+          position="bottom-right"
+          hideProgressBar
+          theme="colored"
+        />
+        <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+          <Outlet />
+        </Box>
+      </ThemeProvider>
     </>
   );
 }
