@@ -1,5 +1,17 @@
 import * as React from "react";
-import { ShoppingCart, KeyboardArrowDown } from "@mui/icons-material";
+import {
+  ShoppingCart,
+  KeyboardArrowDown,
+  Menu as MenuIcon,
+  ExitToApp,
+  PersonAdd,
+  VpnKey,
+  Search,
+  Info,
+  Mail,
+  Favorite,
+  Dashboard,
+} from "@mui/icons-material";
 import {
   AppBar,
   Badge,
@@ -19,33 +31,41 @@ import {
   Typography,
 } from "@mui/material";
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import MenuIcon from "@mui/icons-material/Menu";
 import { logout } from "../features/account/accountSlice";
 import { useAppSelector, useAppDispatch } from "../store/store";
 import { clearCart } from "../features/cart/cartSlice";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
 
 const links = [
-  { title: "Katalog", to: "/catalog" },
-  { title: "Hakkında", to: "/about" },
-  { title: "İletişim", to: "/contact" },
-  { title: "Hata Test", to: "/error" },
+  { title: "Katalog", to: "/catalog", icon: <Search /> },
+  { title: "Hakkında", to: "/about", icon: <Info /> },
+  { title: "İletişim", to: "/contact", icon: <Mail /> },
+  { title: "Hata Test", to: "/error", icon: <Favorite /> },
 ];
 
 const navStyles = {
   color: "inherit",
   textDecoration: "none",
   "&:hover": {
-    color: "error.main",
+    color: "warning.main",
+    transform: "scale(1.05)",
+    transition: "transform 0.2s ease-in-out",
   },
   "&.active": {
     color: "warning.main",
+    borderBottom: "2px solid",
+    borderColor: "warning.main",
   },
   typography: "body1",
 };
 
 const drawerWidth = 240;
 
-export default function Header() {
+interface HeaderProps {
+  onThemeChange: () => void;
+}
+
+export default function Header({ onThemeChange }: HeaderProps) {
   const { cart } = useAppSelector((state) => state.cart);
   const { user } = useAppSelector((state) => state.account);
   const dispatch = useAppDispatch();
@@ -79,9 +99,19 @@ export default function Header() {
   };
 
   const drawer = (
-    <Box onClick={handleDrawerToggle} sx={{ textAlign: "center" }}>
-      <Typography variant="h6" sx={{ my: 2 }}>
-        CALMORA
+    <Box
+      onClick={handleDrawerToggle}
+      sx={{
+        textAlign: "center",
+        bgcolor: "background.default",
+        height: "100%",
+      }}
+    >
+      <Typography
+        variant="h5"
+        sx={{ my: 2, fontWeight: "bold", color: "primary.main" }}
+      >
+        calmora
       </Typography>
       <Divider />
       <List>
@@ -168,15 +198,17 @@ export default function Header() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="sticky" sx={{ boxShadow: 3 }}>
+      <AppBar
+        position="sticky"
+        sx={{ boxShadow: 3, bgcolor: "background.paper" }}
+      >
         <Toolbar
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            height: "64px",
+            height: "80px",
             padding: "0 24px",
-            backgroundColor: "#333",
           }}
         >
           <IconButton
@@ -184,30 +216,30 @@ export default function Header() {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ display: { sm: "none" } }}
+            sx={{ display: { sm: "none" }, color: "text.primary" }}
           >
             <MenuIcon />
           </IconButton>
           <Typography
-            variant="h6"
+            variant="h4"
             component={NavLink}
             to="/"
             sx={{
               textDecoration: "none",
-              color: "inherit",
+              color: "primary.main",
               fontWeight: "bold",
               letterSpacing: 2,
               ml: { xs: 0, sm: 2 },
             }}
           >
-            CALMORA
+            calmora
           </Typography>
 
           <Box
             sx={{
               display: { xs: "none", sm: "flex" },
               alignItems: "center",
-              gap: 2,
+              gap: 3,
               ml: 4,
             }}
           >
@@ -235,11 +267,19 @@ export default function Header() {
               component={NavLink}
               to="/cart"
               size="large"
-              sx={{ color: "inherit" }}
+              sx={{
+                color: "text.primary",
+                "&:hover": {
+                  color: "warning.main",
+                },
+              }}
             >
-              <Badge badgeContent={itemCount} color="secondary">
+              <Badge badgeContent={itemCount} color="error">
                 <ShoppingCart />
               </Badge>
+            </IconButton>
+            <IconButton onClick={onThemeChange} color="inherit">
+              <DarkModeIcon />
             </IconButton>
 
             <Box sx={{ display: { xs: "none", sm: "flex" } }}>
@@ -248,7 +288,7 @@ export default function Header() {
                   <Button
                     onClick={handleMenuClick}
                     endIcon={<KeyboardArrowDown />}
-                    sx={navStyles}
+                    sx={{ ...navStyles, color: "text.primary" }}
                   >
                     {user.name}
                   </Button>
@@ -256,24 +296,52 @@ export default function Header() {
                     anchorEl={anchorEl}
                     open={open}
                     onClose={handleMenuClose}
+                    PaperProps={{
+                      sx: { mt: 1, boxShadow: 3, borderRadius: 2 },
+                    }}
                   >
+                    <MenuItem component={Link} to="/favorities">
+                      <Favorite sx={{ mr: 1 }} /> Favorilerim
+                    </MenuItem>
                     <MenuItem component={Link} to="/orders">
-                      Siparişlerim
+                      <ShoppingCart sx={{ mr: 1 }} /> Siparişlerim
                     </MenuItem>
                     {user.role === "admin" && (
                       <MenuItem onClick={() => navigate("/admin")}>
-                        Admin Paneli
+                        <Dashboard sx={{ mr: 1 }} /> Admin Paneli
                       </MenuItem>
                     )}
-                    <MenuItem onClick={handleLogout}>Çıkış Yap</MenuItem>
+                    <Divider />
+                    <MenuItem
+                      onClick={handleLogout}
+                      sx={{ color: "error.main" }}
+                    >
+                      <ExitToApp sx={{ mr: 1 }} /> Çıkış Yap
+                    </MenuItem>
                   </Menu>
                 </>
               ) : (
                 <>
-                  <Button component={NavLink} to="/login" sx={navStyles}>
+                  <Button
+                    component={NavLink}
+                    to="/login"
+                    sx={{ ...navStyles, color: "text.primary" }}
+                    startIcon={<VpnKey />}
+                  >
                     Giriş Yap
                   </Button>
-                  <Button component={NavLink} to="/register" sx={navStyles}>
+                  <Button
+                    component={NavLink}
+                    to="/register"
+                    variant="contained"
+                    color="primary"
+                    sx={{
+                      ...navStyles,
+                      color: "white",
+                      "&:hover": { bgcolor: "primary.dark" },
+                    }}
+                    startIcon={<PersonAdd />}
+                  >
                     Kayıt Ol
                   </Button>
                 </>
@@ -287,9 +355,7 @@ export default function Header() {
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
+          ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: "block", sm: "none" },
             "& .MuiDrawer-paper": {

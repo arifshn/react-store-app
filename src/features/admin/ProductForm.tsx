@@ -139,20 +139,21 @@ export default function ProductForm({
           onChange={handleInputChange}
         />
         <FormControl fullWidth margin="normal">
-          <InputLabel>Kategori</InputLabel>
+          <InputLabel>Kategori Seçiniz</InputLabel>
           <Select
             label="kategori"
             name="categoryId"
             value={formState.categoryId ?? ""}
             onChange={handleSelectChange}
           >
-            {categories.map((category) => {
-              return (
-                <MenuItem key={category.id} value={category.id}>
-                  {category.kategoriAdi}
-                </MenuItem>
-              );
-            })}
+            <MenuItem value="" disabled>
+              Kategori seçiniz
+            </MenuItem>
+            {categories.map((category) => (
+              <MenuItem key={category.id} value={category.id}>
+                {category.kategoriAdi}
+              </MenuItem>
+            ))}
           </Select>
         </FormControl>
         <FormControlLabel

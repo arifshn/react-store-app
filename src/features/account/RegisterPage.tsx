@@ -6,10 +6,12 @@ import {
   Paper,
   TextField,
   Typography,
+  Grid,
+  Link,
 } from "@mui/material";
 import { useForm, type FieldValues } from "react-hook-form";
 import { LoadingButton } from "@mui/lab";
-import { useNavigate } from "react-router";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import requests from "../../api/requests";
 import { toast } from "react-toastify";
 
@@ -29,47 +31,58 @@ export default function RegisterPage() {
     },
     mode: "onTouched",
   });
-  async function submitForm(data: FieldValues) {
-    requests.Account.register(data)
-      .then(() => {
-        toast.success("user created.");
-        navigate("/login");
-      })
-      .catch((result) => {
-        const { data: errors } = result;
 
-        errors.forEach((error: any) => {
-          if (error.code == "DuplicateUserName") {
-            setError("username", { message: error.description });
-          } else if (error.code == "DuplicateEmail") {
-            setError("email", { message: error.description });
-          }
-        });
+  async function submitForm(data: FieldValues) {
+    try {
+      await requests.Account.register(data);
+      toast.success("Kayıt işlemi başarıyla tamamlandı. Giriş yapabilirsiniz.");
+      navigate("/login");
+    } catch (error: any) {
+      const { data: errors } = error.response;
+      errors.forEach((e: any) => {
+        if (e.code === "DuplicateUserName") {
+          setError("username", { message: "Bu kullanıcı adı zaten alınmış." });
+        } else if (e.code === "DuplicateEmail") {
+          setError("email", {
+            message: "Bu e-posta adresi zaten kullanılıyor.",
+          });
+        } else {
+          toast.error(e.description || "Bilinmeyen bir hata oluştu.");
+        }
       });
+    }
   }
 
   return (
-    <Container maxWidth="xs">
-      <Paper sx={{ marginTop: 8, padding: 2 }} elevation={5}>
+    <Container component="main" maxWidth="xs">
+      <Paper
+        sx={{
+          marginTop: 8,
+          padding: 4,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          borderRadius: 2,
+        }}
+        elevation={3}
+      >
         <Avatar
           sx={{
-            mx: "auto",
-            color: "secondary.main",
-            textAlign: "center",
-            mb: 1,
-            backgroundColor: "primary",
+            m: 1,
+            bgcolor: "primary.main",
           }}
         >
-          <LockOutlined></LockOutlined>
+          <LockOutlined />
         </Avatar>
-        <Typography component="h1" variant="h5" sx={{ textAlign: "center" }}>
+        <Typography component="h1" variant="h5" sx={{ mb: 2 }}>
           Kayıt Ol
         </Typography>
+
         <Box
           component="form"
           onSubmit={handleSubmit(submitForm)}
           noValidate
-          sx={{ mt: 2 }}
+          sx={{ mt: 1 }}
         >
           <TextField
             {...register("username", {
@@ -78,11 +91,11 @@ export default function RegisterPage() {
             size="small"
             label="Kullanıcı Adı Giriniz"
             fullWidth
+            margin="normal"
             autoFocus
-            sx={{ mb: 2 }}
             error={!!errors.username}
             helperText={errors.username?.message}
-          ></TextField>
+          />
           <TextField
             {...register("name", {
               required: "İsim boş olamaz",
@@ -90,25 +103,25 @@ export default function RegisterPage() {
             size="small"
             label="İsim Giriniz"
             fullWidth
-            sx={{ mb: 2 }}
+            margin="normal"
             error={!!errors.name}
             helperText={errors.name?.message}
-          ></TextField>
+          />
           <TextField
             {...register("email", {
-              required: "email is required",
+              required: "E-posta boş olamaz",
               pattern: {
                 value: /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/,
-                message: "email is not valid",
+                message: "Geçerli bir e-posta adresi giriniz",
               },
             })}
-            label="Enter email"
+            label="E-posta Adresi Giriniz"
             fullWidth
-            sx={{ mb: 2 }}
+            margin="normal"
             size="small"
             error={!!errors.email}
             helperText={errors.email?.message}
-          ></TextField>
+          />
           <TextField
             {...register("password", {
               required: "Parola boş olamaz",
@@ -118,21 +131,25 @@ export default function RegisterPage() {
             label="Parola Giriniz"
             type="password"
             fullWidth
-            required
-            sx={{ mb: 2 }}
+            margin="normal"
             error={!!errors.password}
             helperText={errors.password?.message}
-          ></TextField>
+          />
           <LoadingButton
             disabled={!isValid}
             loading={isSubmitting}
             type="submit"
             variant="contained"
             fullWidth
-            sx={{ mt: 1 }}
+            sx={{ mt: 3, mb: 2 }}
           >
             Kayıt Ol
           </LoadingButton>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", mt: 1 }}>
+            <Link component={RouterLink} to="/login" variant="body2">
+              {"Zaten hesabınız var mı? Giriş Yapın"}
+            </Link>
+          </Box>
         </Box>
       </Paper>
     </Container>
