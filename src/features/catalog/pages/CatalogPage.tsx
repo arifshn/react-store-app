@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "../../../store/store";
 import ProductList from "./ProductList";
 import { selectAllProducts, fetchProducts } from "../slices/catalogSlice";
+import { fetchFavorities } from "../../favorite/slices/favoriteSlice";
 
 export default function CatalogPage() {
   const products = useAppSelector(selectAllProducts);
@@ -11,6 +12,7 @@ export default function CatalogPage() {
 
   useEffect(() => {
     if (!isLoaded) dispatch(fetchProducts());
+    dispatch(fetchFavorities());
   }, [isLoaded]);
 
   if (status === "pendingFetchProducts") return <CircularProgress />;
