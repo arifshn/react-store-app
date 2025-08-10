@@ -34,7 +34,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { logout } from "../features/account/slices/accountSlice";
 import { useAppSelector, useAppDispatch } from "../store/store";
 import { clearCart } from "../features/cart/slices/cartSlice";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
+import ThemeSwitch from "./ThemeSwitch";
 
 const links = [
   { title: "Katalog", to: "/catalog", icon: <Search /> },
@@ -44,7 +44,7 @@ const links = [
 ];
 
 const navStyles = {
-  color: "inherit",
+  color: "text.primary", // Bu her zaman görünür olacak
   textDecoration: "none",
   "&:hover": {
     color: "warning.main",
@@ -200,7 +200,12 @@ export default function Header({ onThemeChange }: HeaderProps) {
       <CssBaseline />
       <AppBar
         position="sticky"
-        sx={{ boxShadow: 3, bgcolor: "background.paper" }}
+        sx={{
+          boxShadow: 3,
+          // AppBar'ın rengini tema moduna göre ayarla
+          bgcolor: "background.paper",
+          color: "text.primary",
+        }}
       >
         <Toolbar
           sx={{
@@ -278,9 +283,7 @@ export default function Header({ onThemeChange }: HeaderProps) {
                 <ShoppingCart />
               </Badge>
             </IconButton>
-            <IconButton onClick={onThemeChange} color="inherit">
-              <DarkModeIcon />
-            </IconButton>
+            <ThemeSwitch />
 
             <Box sx={{ display: { xs: "none", sm: "flex" } }}>
               {user ? (
@@ -288,7 +291,15 @@ export default function Header({ onThemeChange }: HeaderProps) {
                   <Button
                     onClick={handleMenuClick}
                     endIcon={<KeyboardArrowDown />}
-                    sx={{ ...navStyles, color: "text.primary" }}
+                    sx={{
+                      color: "text.primary", // Renk eklendi
+                      textDecoration: "none",
+                      "&:hover": {
+                        color: "warning.main",
+                        transform: "scale(1.05)",
+                        transition: "transform 0.2s ease-in-out",
+                      },
+                    }}
                   >
                     {user.name}
                   </Button>
@@ -325,7 +336,7 @@ export default function Header({ onThemeChange }: HeaderProps) {
                   <Button
                     component={NavLink}
                     to="/login"
-                    sx={{ ...navStyles, color: "text.primary" }}
+                    sx={navStyles}
                     startIcon={<VpnKey />}
                   >
                     Giriş Yap
@@ -336,9 +347,12 @@ export default function Header({ onThemeChange }: HeaderProps) {
                     variant="contained"
                     color="primary"
                     sx={{
-                      ...navStyles,
                       color: "white",
-                      "&:hover": { bgcolor: "primary.dark" },
+                      "&:hover": {
+                        bgcolor: "primary.dark",
+                        transform: "scale(1.05)",
+                        transition: "transform 0.2s ease-in-out",
+                      },
                     }}
                     startIcon={<PersonAdd />}
                   >

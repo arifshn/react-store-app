@@ -10,26 +10,26 @@ import {
 import { Outlet } from "react-router";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useAppDispatch } from "../store/store";
+import { useAppDispatch, useAppSelector } from "../store/store";
 import { getCart } from "../features/cart/slices/cartSlice";
 import Header from "./Header";
 import { getUser } from "../features/account/slices/accountSlice";
-import React from "react";
+import { toggleTheme } from "../store/themeSlice";
 
 function App() {
+  const mode = useAppSelector((state) => state.theme.mode);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
-  const [mode, setMode] = React.useState<"light" | "dark">("light");
 
   const theme = createTheme({
     palette: {
-      mode: mode,
+      mode,
     },
   });
-  const handleThemeChange = () => {
-    setMode((prevMode) => (prevMode === "light" ? "dark" : "light"));
-  };
 
+  const handleThemeChange = () => {
+    dispatch(toggleTheme()); // veya theme slice'ındaki action'ı kullan
+  };
   const initApp = async () => {
     await dispatch(getUser());
     await dispatch(getCart());

@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { categoriesSlice } from "../features/categories/slices/categoriesSlice";
 import { orderSlice } from "../features/orders/slices/orderSlice";
 import { favoritiesSlice } from "../features/favorite/slices/favoriteSlice";
+import themeSlice from "./themeSlice";
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     categories: categoriesSlice.reducer,
     order: orderSlice.reducer,
     favorities: favoritiesSlice.reducer,
+    theme: themeSlice.reducer,
   },
 });
 
