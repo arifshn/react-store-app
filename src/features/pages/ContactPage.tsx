@@ -116,7 +116,6 @@ export default function ContactPage() {
 
   return (
     <Box>
-      {/* Hero Section */}
       <Box
         sx={{
           background: (theme) =>
@@ -211,8 +210,6 @@ export default function ContactPage() {
           </Grid>
         </Container>
       </Box>
-
-      {/* Contact Info Cards */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={4}>
           {contactInfo.map((info, index) => (
@@ -257,11 +254,9 @@ export default function ContactPage() {
         </Grid>
       </Container>
 
-      {/* Contact Form & Map */}
       <Box sx={{ bgcolor: "background.paper", py: 8 }}>
         <Container maxWidth="lg">
           <Grid container spacing={6}>
-            {/* Contact Form */}
             <Grid size={{ xs: 12, md: 6 }}>
               <Paper
                 elevation={0}
@@ -360,7 +355,6 @@ export default function ContactPage() {
               </Paper>
             </Grid>
 
-            {/* Map Placeholder */}
             <Grid size={{ xs: 12, md: 6 }}>
               <Paper
                 elevation={0}
@@ -406,7 +400,6 @@ export default function ContactPage() {
         </Container>
       </Box>
 
-      {/* Support Options */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Stack spacing={4}>
           <Box textAlign="center">
@@ -480,11 +473,9 @@ export default function ContactPage() {
         </Stack>
       </Container>
 
-      {/* Social Media & FAQ */}
       <Box sx={{ bgcolor: "background.paper", py: 8 }}>
         <Container maxWidth="lg">
           <Grid container spacing={6}>
-            {/* Social Media */}
             <Grid size={{ xs: 12, md: 6 }}>
               <Paper
                 elevation={0}
@@ -531,7 +522,6 @@ export default function ContactPage() {
               </Paper>
             </Grid>
 
-            {/* FAQ */}
             <Grid size={{ xs: 12, md: 6 }}>
               <Paper
                 elevation={0}

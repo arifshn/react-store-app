@@ -49,22 +49,22 @@ export default function HomePage() {
   const featuredProducts = [
     {
       id: 1,
-      name: "Premium Ayakkabı",
-      price: "₺899",
+      name: "DENEME",
+      price: "0000",
       image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=400",
       rating: 4.8,
     },
     {
       id: 2,
-      name: "Modern Çanta",
-      price: "₺599",
+      name: "DENEME",
+      price: "0000",
       image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400",
       rating: 4.9,
     },
     {
       id: 3,
-      name: "Şık Saat",
-      price: "₺1299",
+      name: "DENEME",
+      price: "0000",
       image:
         "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400",
       rating: 4.7,
@@ -73,7 +73,6 @@ export default function HomePage() {
 
   return (
     <Box>
-      {/* Hero Section */}
       <Box
         sx={{
           background: (theme) =>
@@ -219,7 +218,6 @@ export default function HomePage() {
         </Container>
       </Box>
 
-      {/* Features Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Grid container spacing={4}>
           {features.map((feature, index) => (
@@ -266,9 +264,6 @@ export default function HomePage() {
           ))}
         </Grid>
       </Container>
-
-      {/* Featured Products */}
-      {/* Static Veriler Var Deneme Amaçlı */}
       <Box sx={{ bgcolor: "background.paper", py: 8 }}>
         <Container maxWidth="lg">
           <Stack spacing={4}>
@@ -357,7 +352,6 @@ export default function HomePage() {
         </Container>
       </Box>
 
-      {/* Statistics Section */}
       <Container maxWidth="lg" sx={{ py: 8 }}>
         <Paper
           sx={{

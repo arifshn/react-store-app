@@ -33,6 +33,7 @@ export const createOrder = createAsyncThunk<Order, FieldValues>(
   "order/CreateOrder",
   async (data, { rejectWithValue }) => {
     try {
+      console.log(data);
       return await ordersApi.createOrder(data);
     } catch (error: any) {
       return rejectWithValue({ error: error.data });

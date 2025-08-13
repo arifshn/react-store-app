@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  Grid,
   Paper,
   Stack,
   Step,
@@ -13,12 +12,9 @@ import {
 import AddressForm from "./AddressForm";
 import PaymentForm from "./PaymentForm";
 import Review from "./Review";
+import Info from "./Info";
 import { useState } from "react";
-import {
-  ChevronLeftRounded,
-  ChevronRightRounded,
-  Info,
-} from "@mui/icons-material";
+import { ChevronLeftRounded, ChevronRightRounded } from "@mui/icons-material";
 import { FormProvider, useForm, type FieldValues } from "react-hook-form";
 import { useAppDispatch } from "../../../store/store";
 import { clearCart } from "../../cart/slices/cartSlice";
@@ -67,91 +63,230 @@ export default function CheckoutPage() {
   function handlePrevious() {
     setActiveStep(activeStep - 1);
   }
+
   return (
     <FormProvider {...methods}>
-      <Paper>
-        <Grid container spacing={4}>
-          {activeStep !== steps.length && (
-            <Grid
-              size={4}
+      <Box sx={{ p: { xs: 2, md: 0 } }}>
+        <Paper sx={{ overflow: "hidden" }}>
+          <Box
+            sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" } }}
+          >
+            {activeStep !== steps.length && (
+              <Box
+                sx={{
+                  display: { xs: "none", lg: "block" },
+                  width: { lg: "400px" },
+                  flexShrink: 0,
+                  borderRight: "1px solid",
+                  borderColor: "divider",
+                  p: { lg: 3 },
+                  bgcolor: "grey.50",
+                }}
+              >
+                <Info />
+              </Box>
+            )}
+            {activeStep !== steps.length && (
+              <Box
+                sx={{
+                  display: { xs: "block", lg: "none" },
+                  mb: 2,
+                }}
+              >
+                <Info />
+              </Box>
+            )}
+
+            <Box
               sx={{
-                borderRight: "1px solid",
-                borderColor: "divider",
-                p: 3,
+                flex: 1,
+                p: { xs: 2, md: 3, lg: 4 },
+                minWidth: 0,
               }}
             >
-              <Info />
-            </Grid>
-          )}
+              <Box sx={{ mb: { xs: 3, md: 4 } }}>
+                <Stepper
+                  activeStep={activeStep}
+                  sx={{
+                    height: { xs: "auto", md: 40 },
+                    "& .MuiStepLabel-root": {
+                      flexDirection: { xs: "column", sm: "row" },
+                    },
+                    "& .MuiStepLabel-label": {
+                      fontSize: { xs: "0.75rem", sm: "0.875rem" },
+                    },
+                    "& .MuiStepLabel-iconContainer": {
+                      paddingRight: { xs: 0, sm: 1 },
+                    },
+                  }}
+                >
+                  {steps.map((label) => (
+                    <Step key={label}>
+                      <StepLabel>{label}</StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
+              </Box>
 
-          <Grid size={activeStep !== steps.length ? 8 : 12} sx={{ p: 3 }}>
-            <Box>
-              <Stepper activeStep={activeStep} sx={{ height: 40, mb: 4 }}>
-                {steps.map((label) => (
-                  <Step key={label}>
-                    <StepLabel>{label}</StepLabel>
-                  </Step>
-                ))}
-              </Stepper>
-            </Box>
-            <Box>
-              {activeStep === steps.length ? (
-                <Stack>
-                  <Typography variant="h1">📦</Typography>
-                  <Typography variant="h5">
-                    Teşekkür Ederiz. Siparişinizi Aldık
-                  </Typography>
-                  <Typography variant="body1" sx={{ color: "text.secondary" }}>
-                    Sipariş Numaranız <strong>#{orderId}</strong>. Siparişiniz
-                    onaylandığında size bir eposta göndereceğiz.
-                  </Typography>
-                  <Button
+              <Box>
+                {activeStep === steps.length ? (
+                  <Box
                     sx={{
-                      alignSelf: "start",
-                      width: { xs: "100%", sm: "auto" },
+                      textAlign: { xs: "center", md: "left" },
+                      py: { xs: 4, md: 6 },
                     }}
-                    variant="contained"
                   >
-                    Siparişleri Listele
-                  </Button>
-                </Stack>
-              ) : (
-                <form onSubmit={methods.handleSubmit(handleNext)}>
-                  {getStepContent(activeStep)}
-                  <Box>
-                    <Box
-                      sx={[
-                        { display: "flex" },
-                        activeStep !== 0
-                          ? { justifyContent: "space-between" }
-                          : { justifyContent: "flex-end" },
-                      ]}
+                    <Stack
+                      spacing={3}
+                      alignItems={{ xs: "center", md: "flex-start" }}
+                      sx={{ maxWidth: { xs: "100%", md: "500px" }, mx: "auto" }}
                     >
-                      {activeStep != 0 && (
-                        <Button
-                          startIcon={<ChevronLeftRounded />}
-                          variant="contained"
-                          onClick={handlePrevious}
-                        >
-                          Geri
-                        </Button>
-                      )}
-                      <LoadingButton
-                        type="submit"
-                        loading={loading}
-                        startIcon={<ChevronRightRounded />}
-                        variant="contained"
+                      <Typography
+                        variant="h1"
+                        sx={{
+                          fontSize: { xs: "4rem", md: "6rem" },
+                          mb: 2,
+                        }}
                       >
-                        {activeStep == 2 ? "Siparişi Tamamla" : "İleri"}
-                      </LoadingButton>
-                    </Box>
+                        📦
+                      </Typography>
+                      <Typography
+                        variant="h4"
+                        component="h1"
+                        fontWeight="bold"
+                        color="primary.main"
+                        sx={{ fontSize: { xs: "1.5rem", md: "2rem" } }}
+                      >
+                        Teşekkür Ederiz!
+                      </Typography>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontSize: { xs: "1.1rem", md: "1.25rem" },
+                          color: "text.primary",
+                        }}
+                      >
+                        Siparişinizi başarıyla aldık
+                      </Typography>
+                      <Box
+                        sx={{
+                          p: 3,
+                          bgcolor: "primary.light",
+                          borderRadius: 2,
+                          border: 1,
+                          borderColor: "primary.main",
+                          textAlign: "center",
+                          width: "100%",
+                        }}
+                      >
+                        <Typography
+                          variant="body2"
+                          color="primary.dark"
+                          sx={{ mb: 1 }}
+                        >
+                          Sipariş Numaranız
+                        </Typography>
+                        <Typography
+                          variant="h5"
+                          fontWeight="bold"
+                          color="primary.main"
+                          sx={{ fontSize: { xs: "1.25rem", md: "1.5rem" } }}
+                        >
+                          #{orderId}
+                        </Typography>
+                      </Box>
+                      <Typography
+                        variant="body1"
+                        color="text.secondary"
+                        sx={{
+                          fontSize: { xs: "0.875rem", md: "1rem" },
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        Siparişiniz onaylandığında size bir e-posta
+                        göndereceğiz. Kargo takip bilgileri de e-posta ile
+                        paylaşılacaktır.
+                      </Typography>
+                      <Box sx={{ pt: 2, width: "100%" }}>
+                        <Button
+                          variant="contained"
+                          size="large"
+                          sx={{
+                            py: 1.5,
+                            px: 4,
+                            fontSize: { xs: "1rem", md: "1.1rem" },
+                            fontWeight: "bold",
+                            width: { xs: "100%", sm: "auto" },
+                            minWidth: { sm: "200px" },
+                          }}
+                        >
+                          Siparişleri Görüntüle
+                        </Button>
+                      </Box>
+                    </Stack>
                   </Box>
-                </form>
-              )}
+                ) : (
+                  <form onSubmit={methods.handleSubmit(handleNext)}>
+                    <Box sx={{ mb: 4 }}>{getStepContent(activeStep)}</Box>
+                    <Box
+                      sx={{
+                        pt: 3,
+                        borderTop: 1,
+                        borderColor: "divider",
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          flexDirection: { xs: "column", sm: "row" },
+                          gap: 2,
+                          justifyContent:
+                            activeStep !== 0 ? "space-between" : "flex-end",
+                        }}
+                      >
+                        {activeStep !== 0 && (
+                          <Button
+                            startIcon={<ChevronLeftRounded />}
+                            variant="outlined"
+                            onClick={handlePrevious}
+                            size="large"
+                            sx={{
+                              order: { xs: 2, sm: 1 },
+                              py: 1.5,
+                              px: 3,
+                              fontSize: { xs: "1rem", sm: "0.875rem" },
+                              fontWeight: "medium",
+                            }}
+                          >
+                            Geri
+                          </Button>
+                        )}
+                        <LoadingButton
+                          type="submit"
+                          loading={loading}
+                          endIcon={<ChevronRightRounded />}
+                          variant="contained"
+                          size="large"
+                          sx={{
+                            order: { xs: 1, sm: 2 },
+                            py: 1.5,
+                            px: 4,
+                            fontSize: { xs: "1rem", sm: "0.875rem" },
+                            fontWeight: "bold",
+                            minWidth: { xs: "auto", sm: "160px" },
+                          }}
+                        >
+                          {activeStep === 2 ? "Siparişi Tamamla" : "İleri"}
+                        </LoadingButton>
+                      </Box>
+                    </Box>
+                  </form>
+                )}
+              </Box>
             </Box>
-          </Grid>
-        </Grid>
-      </Paper>
+          </Box>
+        </Paper>
+      </Box>
     </FormProvider>
   );
 }
