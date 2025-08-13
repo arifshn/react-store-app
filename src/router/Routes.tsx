@@ -20,6 +20,7 @@ import ProductDetailsPage from "../features/catalog/pages/ProductDetailsPage";
 import LoginPage from "../features/account/pages/LoginPage";
 import AdminLayout from "../features/admin/pages/AdminLayout";
 import OrdersPage from "../features/admin/pages/OrdersPage";
+import ReviewPage from "../features/review/pages/ReviewTestPage";
 
 export const router = createBrowserRouter([
   {
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
       { path: "favorities", element: <FavoritePage /> },
+      { path: "review", element: <ReviewPage /> },
       {
         element: <AuthGuard />,
         children: [

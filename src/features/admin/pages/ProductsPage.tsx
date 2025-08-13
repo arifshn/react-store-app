@@ -8,15 +8,28 @@ import {
   createProduct,
   updateProduct,
 } from "../../catalog/slices/catalogSlice";
-import { Button } from "@mui/material";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Button,
+  Divider,
+  Typography,
+} from "@mui/material";
 import ProductForm from "./ProductForm";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { fetchCategories } from "../../categories/slices/categoriesSlice";
+import {
+  fetchCategories,
+  selectAllCategories,
+} from "../../categories/slices/categoriesSlice";
 import type { IProduct } from "../../catalog/models/IProduct";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 export default function ProductsPage() {
   const dispatch = useAppDispatch();
   const products = useAppSelector(selectAllProducts);
+  const categories = useAppSelector(selectAllCategories);
   const isLoaded = useAppSelector((state) => state.catalog.isLoaded);
   const status = useAppSelector((state) => state.catalog.status);
 
@@ -101,21 +114,126 @@ export default function ProductsPage() {
   );
 
   return (
-    <>
-      <Button variant="contained" onClick={handleOpenCreate} sx={{ mb: 2 }}>
-        Yeni Ürün Ekle
-      </Button>
-      <Paper style={{ height: 600, width: "100%", padding: 16 }}>
-        <h2>Ürün Listesi</h2>
-        <DataGrid
-          rows={validProducts}
-          columns={columns}
-          loading={status === "pendingFetchProducts"}
-          getRowId={(row) => row.id}
-          pageSizeOptions={[10, 25, 50]}
-          paginationModel={{ pageSize: 10, page: 0 }}
-        />
-      </Paper>
+    <Box sx={{ p: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 2,
+        }}
+      >
+        <Typography variant="h4" component="h1" fontWeight="bold">
+          Ürün Listesi
+        </Typography>
+        <Button variant="contained" onClick={handleOpenCreate} size="large">
+          Yeni Ürün Ekle
+        </Button>
+      </Box>
+
+      <Box sx={{ display: { xs: "none", md: "block" } }}>
+        <Paper style={{ height: 600, width: "100%", padding: 16 }}>
+          <DataGrid
+            rows={validProducts}
+            columns={columns}
+            loading={status === "pendingFetchProducts"}
+            getRowId={(row) => row.id}
+            pageSizeOptions={[10, 25, 50]}
+            paginationModel={{ pageSize: 10, page: 0 }}
+            sx={{
+              border: "none",
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "background.default",
+                fontWeight: "bold",
+              },
+            }}
+          />
+        </Paper>
+      </Box>
+
+      <Box sx={{ display: { xs: "block", md: "none" } }}>
+        {validProducts.map((product) => (
+          <Accordion
+            key={product.id}
+            sx={{
+              mb: 2,
+              borderRadius: 2,
+              boxShadow: 1,
+              "&.Mui-expanded": {
+                boxShadow: 3,
+              },
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`panel-${product.id}-content`}
+              id={`panel-${product.id}-header`}
+            >
+              <Box>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  {product.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  ID: #{product.id}
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Box sx={{ mb: 2, display: "grid", gap: 1 }}>
+                <Typography variant="body2">
+                  <Box component="span" fontWeight="bold">
+                    Fiyat:
+                  </Box>{" "}
+                  {product.price} TL
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" fontWeight="bold">
+                    Stok:
+                  </Box>{" "}
+                  {product.stock}
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" fontWeight="bold">
+                    Açıklama:
+                  </Box>{" "}
+                  {product.description}
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" fontWeight="bold">
+                    Kategori:
+                  </Box>{" "}
+                  {product.category?.kategoriAdi ?? "Belirtilmemiş"}
+                </Typography>
+                <Typography variant="body2">
+                  <Box component="span" fontWeight="bold">
+                    Aktif:
+                  </Box>{" "}
+                  {product.isActive ? "Evet" : "Hayır"}
+                </Typography>
+              </Box>
+              <Divider />
+              <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="primary"
+                  onClick={() => handleOpenEdit(product.id)}
+                >
+                  Düzenle
+                </Button>
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="error"
+                  onClick={() => handleDelete(product.id)}
+                >
+                  Sil
+                </Button>
+              </Box>
+            </AccordionDetails>
+          </Accordion>
+        ))}
+      </Box>
 
       {openForm && (
         <ProductForm
@@ -124,6 +242,6 @@ export default function ProductsPage() {
           onSubmit={handleSubmitForm}
         />
       )}
-    </>
+    </Box>
   );
 }

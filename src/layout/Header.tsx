@@ -44,7 +44,7 @@ const links = [
 ];
 
 const navStyles = {
-  color: "text.primary", // Bu her zaman görünür olacak
+  color: "text.primary",
   textDecoration: "none",
   "&:hover": {
     color: "warning.main",
@@ -105,11 +105,15 @@ export default function Header({ onThemeChange }: HeaderProps) {
         textAlign: "center",
         bgcolor: "background.default",
         height: "100%",
+        pt: 2,
       }}
     >
       <Typography
         variant="h5"
         sx={{ my: 2, fontWeight: "bold", color: "primary.main" }}
+        component={NavLink}
+        to="/"
+        style={{ textDecoration: "none" }}
       >
         calmora
       </Typography>
@@ -117,52 +121,88 @@ export default function Header({ onThemeChange }: HeaderProps) {
       <List>
         <ListItem disablePadding>
           <ListItemButton
-            sx={{ textAlign: "center" }}
+            sx={{
+              justifyContent: "center",
+              py: 1.5,
+              "&:hover": {
+                bgcolor: "action.hover",
+              },
+            }}
             component={NavLink}
             to="/"
           >
-            <ListItemText primary="Ana Sayfa" />
+            <ListItemText
+              primary="Ana Sayfa"
+              sx={{ color: "text.primary", fontWeight: "bold" }}
+            />
           </ListItemButton>
         </ListItem>
         {links.map((item) => (
           <ListItem key={item.title} disablePadding>
             <ListItemButton
-              sx={{ textAlign: "center" }}
+              sx={{
+                justifyContent: "center",
+                py: 1.5,
+                "&:hover": {
+                  bgcolor: "action.hover",
+                },
+              }}
               component={NavLink}
               to={item.to}
             >
-              <ListItemText primary={item.title} />
+              <ListItemText
+                primary={item.title}
+                sx={{ color: "text.primary" }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
       </List>
-      <Divider />
+      <Divider sx={{ my: 1 }} />
       <List>
         {user ? (
           <>
             <ListItem disablePadding>
               <ListItemButton
-                sx={{ textAlign: "center" }}
+                sx={{ justifyContent: "center", py: 1.5 }}
                 component={NavLink}
                 to="/orders"
               >
-                <ListItemText primary="Siparişlerim" />
+                <ListItemText
+                  primary="Siparişlerim"
+                  sx={{ color: "text.primary" }}
+                />
               </ListItemButton>
             </ListItem>
-            {user.role === "Admin" && (
+            <ListItem disablePadding>
+              <ListItemButton
+                sx={{ justifyContent: "center", py: 1.5 }}
+                component={NavLink}
+                to="/favorities"
+              >
+                <ListItemText
+                  primary="Favorilerim"
+                  sx={{ color: "text.primary" }}
+                />
+              </ListItemButton>
+            </ListItem>
+            {user.role === "admin" && (
               <ListItem disablePadding>
                 <ListItemButton
-                  sx={{ textAlign: "center" }}
+                  sx={{ justifyContent: "center", py: 1.5 }}
                   component={NavLink}
                   to="/admin"
                 >
-                  <ListItemText primary="Admin Paneli" />
+                  <ListItemText
+                    primary="Admin Paneli"
+                    sx={{ color: "text.primary" }}
+                  />
                 </ListItemButton>
               </ListItem>
             )}
             <ListItem disablePadding>
               <ListItemButton
-                sx={{ textAlign: "center" }}
+                sx={{ justifyContent: "center", py: 1.5, color: "error.main" }}
                 onClick={handleLogout}
               >
                 <ListItemText primary="Çıkış Yap" />
@@ -173,20 +213,26 @@ export default function Header({ onThemeChange }: HeaderProps) {
           <>
             <ListItem disablePadding>
               <ListItemButton
-                sx={{ textAlign: "center" }}
+                sx={{ justifyContent: "center", py: 1.5 }}
                 component={NavLink}
                 to="/login"
               >
-                <ListItemText primary="Giriş Yap" />
+                <ListItemText
+                  primary="Giriş Yap"
+                  sx={{ color: "text.primary" }}
+                />
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
               <ListItemButton
-                sx={{ textAlign: "center" }}
+                sx={{ justifyContent: "center", py: 1.5 }}
                 component={NavLink}
                 to="/register"
               >
-                <ListItemText primary="Kayıt Ol" />
+                <ListItemText
+                  primary="Kayıt Ol"
+                  sx={{ color: "text.primary" }}
+                />
               </ListItemButton>
             </ListItem>
           </>
@@ -202,7 +248,6 @@ export default function Header({ onThemeChange }: HeaderProps) {
         position="sticky"
         sx={{
           boxShadow: 3,
-          // AppBar'ın rengini tema moduna göre ayarla
           bgcolor: "background.paper",
           color: "text.primary",
         }}
@@ -212,71 +257,79 @@ export default function Header({ onThemeChange }: HeaderProps) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            height: "80px",
-            padding: "0 24px",
+            height: { xs: "64px", md: "80px" },
+            px: { xs: 2, md: 4 },
           }}
         >
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ display: { sm: "none" }, color: "text.primary" }}
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography
-            variant="h4"
-            component={NavLink}
-            to="/"
-            sx={{
-              textDecoration: "none",
-              color: "primary.main",
-              fontWeight: "bold",
-              letterSpacing: 2,
-              ml: { xs: 0, sm: 2 },
-            }}
-          >
-            calmora
-          </Typography>
+          <Box display="flex" alignItems="center">
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ display: { sm: "none" }, color: "text.primary" }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography
+              variant="h4"
+              component={NavLink}
+              to="/"
+              sx={{
+                textDecoration: "none",
+                color: "primary.main",
+                fontWeight: "bold",
+                letterSpacing: 2,
+                ml: { xs: 0, sm: 2 },
+                fontSize: { xs: "1.25rem", sm: "2rem" },
+              }}
+            >
+              calmora
+            </Typography>
 
-          <Box
-            sx={{
-              display: { xs: "none", sm: "flex" },
-              alignItems: "center",
-              gap: 3,
-              ml: 4,
-            }}
-          >
-            {links.map((item) => (
-              <Button
-                component={NavLink}
-                to={item.to}
-                key={item.title}
-                sx={navStyles}
-              >
-                {item.title}
-              </Button>
-            ))}
+            <Box
+              sx={{
+                display: { xs: "none", sm: "flex" },
+                alignItems: "center",
+                gap: 3,
+                ml: 4,
+              }}
+            >
+              {links.map((item) => (
+                <Button
+                  component={NavLink}
+                  to={item.to}
+                  key={item.title}
+                  sx={navStyles}
+                  endIcon={item.icon}
+                >
+                  {item.title}
+                </Button>
+              ))}
+            </Box>
           </Box>
 
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
-              gap: 2,
+              gap: { xs: 0.5, md: 2 },
               ml: "auto",
             }}
           >
             <IconButton
+              size="large"
+              sx={{ display: { xs: "block", sm: "none" } }}
+            >
+              <Search />
+            </IconButton>
+            <IconButton
+              size="large"
               component={NavLink}
               to="/cart"
-              size="large"
               sx={{
                 color: "text.primary",
-                "&:hover": {
-                  color: "warning.main",
-                },
+                "&:hover": { color: "warning.main" },
               }}
             >
               <Badge badgeContent={itemCount} color="error">
@@ -284,22 +337,13 @@ export default function Header({ onThemeChange }: HeaderProps) {
               </Badge>
             </IconButton>
             <ThemeSwitch />
-
             <Box sx={{ display: { xs: "none", sm: "flex" } }}>
               {user ? (
-                <>
+                <Box>
                   <Button
                     onClick={handleMenuClick}
                     endIcon={<KeyboardArrowDown />}
-                    sx={{
-                      color: "text.primary", // Renk eklendi
-                      textDecoration: "none",
-                      "&:hover": {
-                        color: "warning.main",
-                        transform: "scale(1.05)",
-                        transition: "transform 0.2s ease-in-out",
-                      },
-                    }}
+                    sx={{ ...navStyles, ml: 2, color: "text.primary" }}
                   >
                     {user.name}
                   </Button>
@@ -330,13 +374,19 @@ export default function Header({ onThemeChange }: HeaderProps) {
                       <ExitToApp sx={{ mr: 1 }} /> Çıkış Yap
                     </MenuItem>
                   </Menu>
-                </>
+                </Box>
               ) : (
-                <>
+                <Box display="flex" gap={1}>
                   <Button
                     component={NavLink}
                     to="/login"
-                    sx={navStyles}
+                    sx={{
+                      ...navStyles,
+                      "&:hover": {
+                        ...navStyles["&:hover"],
+                        bgcolor: "transparent",
+                      },
+                    }}
                     startIcon={<VpnKey />}
                   >
                     Giriş Yap
@@ -358,7 +408,7 @@ export default function Header({ onThemeChange }: HeaderProps) {
                   >
                     Kayıt Ol
                   </Button>
-                </>
+                </Box>
               )}
             </Box>
           </Box>
@@ -375,6 +425,7 @@ export default function Header({ onThemeChange }: HeaderProps) {
             "& .MuiDrawer-paper": {
               boxSizing: "border-box",
               width: drawerWidth,
+              bgcolor: "background.paper",
             },
           }}
         >
