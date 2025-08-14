@@ -2,6 +2,7 @@ import {
   createAsyncThunk,
   createEntityAdapter,
   createSlice,
+  type PayloadAction,
 } from "@reduxjs/toolkit";
 
 import type { RootState } from "../../../store/store";
@@ -9,12 +10,19 @@ import type { FieldValues } from "react-hook-form";
 import { catalogApi } from "../api/catalogApi";
 import type { IProduct } from "../models/IProduct";
 
-export const fetchProducts = createAsyncThunk<IProduct[]>(
-  "catalog/fetchProducts",
-  async () => {
-    return await catalogApi.list();
-  }
-);
+export interface ProductFilters {
+  categoryId?: number;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+export const fetchProducts = createAsyncThunk<
+  IProduct[],
+  ProductFilters | undefined
+>("catalog/fetchProducts", async (filters) => {
+  return await catalogApi.list(filters);
+});
 
 export const fetchProductsById = createAsyncThunk<IProduct, number>(
   "catalog/fetchProductsById",
@@ -28,6 +36,12 @@ const initialState = productsAdapter.getInitialState({
   status: "idle",
   isLoaded: false,
   selectedProduct: null as IProduct | null,
+  filters: {
+    categoryId: undefined,
+    search: "",
+    page: 1,
+    pageSize: 12,
+  } as ProductFilters,
 });
 
 export const createProduct = createAsyncThunk<IProduct, FieldValues>(
@@ -73,6 +87,19 @@ export const catalogSlice = createSlice({
     clearSelectedProduct: (state) => {
       state.selectedProduct = null;
     },
+    setFilters: (state, action: PayloadAction<Partial<ProductFilters>>) => {
+      state.filters = { ...state.filters, ...action.payload };
+      state.isLoaded = false;
+    },
+    clearFilters: (state) => {
+      state.filters = {
+        categoryId: undefined,
+        search: "",
+        page: 1,
+        pageSize: 12,
+      };
+      state.isLoaded = false;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchProducts.pending, (state) => {
@@ -86,6 +113,7 @@ export const catalogSlice = createSlice({
     builder.addCase(fetchProducts.rejected, (state) => {
       state.status = "idle";
     });
+
     builder.addCase(fetchProductsById.pending, (state) => {
       state.status = "pendingFetchProductById";
     });
@@ -96,6 +124,7 @@ export const catalogSlice = createSlice({
     builder.addCase(fetchProductsById.rejected, (state) => {
       state.status = "idle";
     });
+
     builder.addCase(createProduct.fulfilled, (state, action) => {
       productsAdapter.addOne(state, action.payload);
     });
@@ -117,6 +146,9 @@ export const catalogSlice = createSlice({
   },
 });
 
+export const { clearSelectedProduct, setFilters, clearFilters } =
+  catalogSlice.actions;
+
 export const {
   selectById: selectProductById,
   selectIds: selectProductIds,
@@ -124,3 +156,5 @@ export const {
   selectAll: selectAllProducts,
   selectTotal: selectTotalProducts,
 } = productsAdapter.getSelectors((state: RootState) => state.catalog);
+
+export const selectFilters = (state: RootState) => state.catalog.filters;
