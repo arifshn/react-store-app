@@ -1,8 +1,33 @@
 import type { FieldValues } from "react-hook-form";
 import axiosClient from "../../../shared/api/axiosClient";
+import type { ProductFilters } from "../slices/catalogSlice";
 
 export const catalogApi = {
-  list: () => axiosClient.get("products").then((res) => res.data),
+  list: (filters?: ProductFilters & { showInactive?: boolean }) => {
+    const params: Record<string, any> = {};
+
+    if (filters?.categoryId) {
+      params.categoryId = filters.categoryId;
+    }
+    if (filters?.search && filters.search.trim()) {
+      params.search = filters.search.trim();
+    }
+    if (filters?.page) {
+      params.page = filters.page;
+    }
+    if (filters?.pageSize) {
+      params.pageSize = filters.pageSize;
+    }
+    if (filters?.showInactive !== undefined)
+      params.showInactive = filters.showInactive;
+
+    return axiosClient.get("products", { params }).then((res) => {
+      if (res.data.products) {
+        return res.data.products;
+      }
+      return res.data;
+    });
+  },
   details: (id: number) =>
     axiosClient.get(`products/${id}`).then((res) => res.data),
   CreateProduct: (data: FieldValues) =>
@@ -14,4 +39,5 @@ export const catalogApi = {
   },
   DeleteProduct: (id: number) =>
     axiosClient.delete(`products/${id}`).then((res) => res.data),
+  getCategories: () => axiosClient.get("categories").then((res) => res.data),
 };

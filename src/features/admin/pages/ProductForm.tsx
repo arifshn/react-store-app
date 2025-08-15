@@ -42,7 +42,7 @@ export default function ProductForm({
     description: product?.description ?? "",
     imageUrl: product?.imageUrl ?? "",
     isActive: product?.isActive ?? true,
-    categoryId: product?.categoryID ?? "",
+    categoryID: product?.categoryID ?? "",
   });
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function ProductForm({
         description: product.description,
         imageUrl: product.imageUrl,
         isActive: product.isActive,
-        categoryId: product.categoryID ?? "",
+        categoryID: product.categoryID ?? "",
       });
     }
   }, [product]);
@@ -68,11 +68,9 @@ export default function ProductForm({
     }));
   };
   const handleSelectChange = (e: SelectChangeEvent<string | number>) => {
-    const { name, value } = e.target;
     setFormState((prev) => ({
       ...prev,
-      categoryId: Number(e.target.value) || "",
-      [name]: value,
+      categoryID: Number(e.target.value),
     }));
   };
 
@@ -83,7 +81,7 @@ export default function ProductForm({
       ...dataToSend,
       price: Number(dataToSend.price),
       stock: Number(dataToSend.stock),
-      categoryId: Number(dataToSend.categoryId),
+      categoryId: Number(dataToSend.categoryID),
     };
     console.log("Gönderilen formState id:", formState);
     console.log("Gönderilen veri:", finalData);
@@ -142,8 +140,8 @@ export default function ProductForm({
           <InputLabel>Kategori Seçiniz</InputLabel>
           <Select
             label="kategori"
-            name="categoryId"
-            value={formState.categoryId ?? ""}
+            name="categoryID"
+            value={formState.categoryID.toString() ?? ""}
             onChange={handleSelectChange}
           >
             <MenuItem value="" disabled>

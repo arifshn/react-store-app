@@ -1,4 +1,5 @@
-import type { ICategory } from "../features/categories/models/ICategory";
+import type { ICategory } from "../../categories/models/ICategory";
+
 export interface IProduct {
   id: number;
   name: string;
