@@ -10,8 +10,25 @@ import {
   Paper,
   IconButton,
   CircularProgress,
+  Card,
+  CardContent,
+  Fade,
+  Skeleton,
+  Divider,
+  Badge,
+  useTheme,
+  alpha,
+  useMediaQuery,
 } from "@mui/material";
-import { Search, Clear, GridView, ViewList } from "@mui/icons-material";
+import {
+  Search,
+  Clear,
+  GridView,
+  ViewList,
+  FilterList,
+  ShoppingBag,
+  Inventory,
+} from "@mui/icons-material";
 import { useAppSelector, useAppDispatch } from "../../../store/store";
 import ProductList from "./ProductList";
 import {
@@ -28,6 +45,12 @@ import {
 } from "../../categories/slices/categoriesSlice";
 
 export default function CatalogPage() {
+  const theme = useTheme();
+  const isDark = theme.palette.mode === "dark";
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
+  const { user } = useAppSelector((state) => state.account);
+
   const products = useAppSelector(selectAllProducts);
   const categories = useAppSelector(selectAllCategories);
   const filters = useAppSelector(selectFilters);
@@ -39,6 +62,12 @@ export default function CatalogPage() {
 
   const [searchInput, setSearchInput] = useState(filters?.search || "");
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+
+  useEffect(() => {
+    if (user?.token) {
+      dispatch(fetchFavorities());
+    }
+  }, [dispatch, user?.token]);
 
   useEffect(() => {
     if (!categoriesLoaded) {
@@ -81,116 +110,242 @@ export default function CatalogPage() {
   };
 
   const isFilterActive = filters?.categoryId || filters?.search;
+  const activeFilterCount =
+    (filters?.categoryId ? 1 : 0) + (filters?.search ? 1 : 0);
 
-  if (status === "pendingFetchProducts") {
+  if (status === "pendingFetchProducts" && !isLoaded) {
     return (
       <Box
         display="flex"
         justifyContent="center"
         alignItems="center"
-        minHeight="50vh"
+        minHeight="60vh"
+        sx={{
+          bgcolor: isDark ? "grey.900" : "grey.50",
+          px: 2,
+        }}
       >
-        <CircularProgress size={60} thickness={4} />
+        <Stack alignItems="center" spacing={3}>
+          <CircularProgress
+            size={isMobile ? 48 : 64}
+            thickness={3.6}
+            sx={{
+              color: theme.palette.primary.main,
+            }}
+          />
+          <Typography
+            variant={isMobile ? "body1" : "h6"}
+            color="text.secondary"
+            sx={{
+              fontWeight: 500,
+              textAlign: "center",
+            }}
+          >
+            Ürünler yükleniyor...
+          </Typography>
+        </Stack>
       </Box>
     );
   }
 
   return (
-    <Box sx={{ bgcolor: "grey.50", minHeight: "100vh" }}>
+    <Box
+      sx={{
+        bgcolor: isDark ? "grey.900" : "grey.50",
+        minHeight: "100vh",
+        transition: "background-color 0.3s ease",
+      }}
+    >
       <Paper
-        elevation={1}
+        elevation={isDark ? 0 : 2}
         sx={{
           position: "sticky",
           top: 0,
-          zIndex: 1000,
-          bgcolor: "white",
+          zIndex: 1200,
+          bgcolor: isDark ? "grey.800" : "background.paper",
           borderRadius: 0,
+          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+          backdropFilter: "blur(20px)",
+          transition: "all 0.3s ease",
         }}
       >
         <Container maxWidth="xl">
-          <Box py={3}>
+          <Box py={isMobile ? 2 : 3}>
             <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={3}
-              alignItems={{ xs: "stretch", sm: "center" }}
-              justifyContent="space-between"
-              mb={3}
+              direction="row"
+              alignItems="center"
+              spacing={isMobile ? 1.5 : 2}
+              mb={isMobile ? 2 : 3}
             >
-              <Typography
-                variant="h4"
-                component="h1"
-                fontWeight="bold"
-                color="text.primary"
+              <Box
+                sx={{
+                  p: isMobile ? 1 : 1.5,
+                  borderRadius: 2,
+                  bgcolor: alpha(theme.palette.primary.main, 0.1),
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
               >
-                Ürün Kataloğu
-              </Typography>
-              <Stack direction="row" spacing={2} alignItems="center">
-                <TextField
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                  placeholder="Ürün ara..."
-                  size="small"
+                <Inventory
                   sx={{
-                    minWidth: { xs: "100%", sm: 300 },
-                    "& .MuiOutlinedInput-root": {
-                      borderRadius: 2,
-                      bgcolor: "white",
-                    },
-                  }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <Search color="action" />
-                      </InputAdornment>
-                    ),
-                    endAdornment: searchInput && (
-                      <InputAdornment position="end">
-                        <IconButton
-                          size="small"
-                          onClick={handleClearSearch}
-                          edge="end"
-                        >
-                          <Clear />
-                        </IconButton>
-                      </InputAdornment>
-                    ),
+                    fontSize: isMobile ? 24 : 28,
+                    color: theme.palette.primary.main,
                   }}
                 />
-                <IconButton
-                  onClick={handleSearch}
+              </Box>
+              <Stack spacing={0.5}>
+                <Typography
+                  variant={isMobile ? "h5" : "h4"}
+                  component="h1"
                   sx={{
-                    bgcolor: "primary.main",
-                    color: "white",
-                    "&:hover": { bgcolor: "primary.dark" },
-                    borderRadius: 2,
-                    px: 2,
+                    fontWeight: 700,
+                    color: "text.primary",
+                    fontSize: isMobile
+                      ? "1.5rem"
+                      : { xs: "1.75rem", sm: "2.125rem" },
+                    lineHeight: 1.2,
                   }}
                 >
-                  <Search />
-                </IconButton>
+                  Ürün Kataloğu
+                </Typography>
+                {!isMobile && (
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ fontWeight: 500 }}
+                  >
+                    Geniş ürün yelpazemizi keşfedin
+                  </Typography>
+                )}
               </Stack>
             </Stack>
             <Stack
+              direction={isMobile ? "column" : "row"}
+              spacing={isMobile ? 1.5 : 1}
+              alignItems="stretch"
+              mb={isMobile ? 2 : 3}
+            >
+              <TextField
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Ürün ara..."
+                size={isMobile ? "small" : "medium"}
+                fullWidth={isMobile}
+                sx={{
+                  flex: 1,
+                  maxWidth: isMobile ? "100%" : 400,
+                  "& .MuiOutlinedInput-root": {
+                    borderRadius: isMobile ? 2 : 3,
+                    bgcolor: isDark
+                      ? alpha(theme.palette.background.paper, 0.8)
+                      : "background.paper",
+                    backdropFilter: "blur(10px)",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      boxShadow: isDark ? "none" : "0 4px 12px rgba(0,0,0,0.1)",
+                    },
+                    "&.Mui-focused": {
+                      boxShadow: `0 0 0 2px ${alpha(
+                        theme.palette.primary.main,
+                        0.2
+                      )}`,
+                    },
+                  },
+                }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search
+                        sx={{
+                          color: "text.secondary",
+                          fontSize: isMobile ? 18 : 20,
+                        }}
+                      />
+                    </InputAdornment>
+                  ),
+                  endAdornment: searchInput && (
+                    <InputAdornment position="end">
+                      <IconButton
+                        size="small"
+                        onClick={handleClearSearch}
+                        edge="end"
+                        sx={{
+                          color: "text.secondary",
+                          "&:hover": {
+                            bgcolor: alpha(theme.palette.error.main, 0.1),
+                            color: "error.main",
+                          },
+                        }}
+                      >
+                        <Clear fontSize="small" />
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              <IconButton
+                onClick={handleSearch}
+                size={isMobile ? "medium" : "large"}
+                sx={{
+                  bgcolor: theme.palette.primary.main,
+                  color: "primary.contrastText",
+                  borderRadius: isMobile ? 2 : 3,
+                  px: isMobile ? 2 : 3,
+                  py: isMobile ? 1 : 1.5,
+                  minWidth: isMobile ? 48 : 56,
+                  "&:hover": {
+                    bgcolor: theme.palette.primary.dark,
+                    transform: "translateY(-1px)",
+                    boxShadow: theme.shadows[4],
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                <Search fontSize={isMobile ? "small" : "medium"} />
+              </IconButton>
+            </Stack>
+
+            <Stack
               direction="row"
-              spacing={1}
-              mb={2}
-              flexWrap="wrap"
-              useFlexGap
+              spacing={isMobile ? 1 : 1.5}
+              mb={isMobile ? 2 : 3}
+              sx={{
+                overflowX: "auto",
+                pb: 1,
+                "&::-webkit-scrollbar": {
+                  height: isMobile ? 4 : 6,
+                },
+                "&::-webkit-scrollbar-track": {
+                  bgcolor: alpha(theme.palette.divider, 0.1),
+                  borderRadius: 3,
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  bgcolor: alpha(theme.palette.text.secondary, 0.3),
+                  borderRadius: 3,
+                },
+              }}
             >
               <Chip
-                label="Tüm Kategoriler"
+                label="Tümü"
                 onClick={() => handleCategoryFilter()}
                 color={!filters?.categoryId ? "primary" : "default"}
                 variant={!filters?.categoryId ? "filled" : "outlined"}
+                size={isMobile ? "small" : "medium"}
                 sx={{
-                  borderRadius: 2,
-                  fontWeight: 500,
+                  borderRadius: isMobile ? 2 : 3,
+                  fontWeight: 600,
+                  fontSize: isMobile ? "0.75rem" : "0.875rem",
+                  px: isMobile ? 1.5 : 2,
+                  py: 0.5,
+                  minWidth: "auto",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.2s ease",
                   "&:hover": {
-                    transform: "translateY(-1px)",
-                    boxShadow: 1,
+                    transform: isMobile ? "none" : "translateY(-2px)",
+                    boxShadow: isDark || isMobile ? "none" : theme.shadows[2],
                   },
-                  transition: "all 0.2s",
                 }}
               />
               {categories.map((category: any) => (
@@ -204,94 +359,241 @@ export default function CatalogPage() {
                   variant={
                     filters?.categoryId === category.id ? "filled" : "outlined"
                   }
+                  size={isMobile ? "small" : "medium"}
                   sx={{
-                    borderRadius: 2,
-                    fontWeight: 500,
+                    borderRadius: isMobile ? 2 : 3,
+                    fontWeight: 600,
+                    fontSize: isMobile ? "0.75rem" : "0.875rem",
+                    px: isMobile ? 1.5 : 2,
+                    py: 0.5,
+                    minWidth: "auto",
+                    whiteSpace: "nowrap",
+                    transition: "all 0.2s ease",
                     "&:hover": {
-                      transform: "translateY(-1px)",
-                      boxShadow: 1,
+                      transform: isMobile ? "none" : "translateY(-2px)",
+                      boxShadow: isDark || isMobile ? "none" : theme.shadows[2],
                     },
-                    transition: "all 0.2s",
                   }}
                 />
               ))}
             </Stack>
+
+            <Divider sx={{ mb: 2, opacity: 0.6 }} />
+
             <Stack
-              direction="row"
+              direction={isMobile ? "column" : "row"}
               justifyContent="space-between"
-              alignItems="center"
+              alignItems={isMobile ? "flex-start" : "center"}
+              spacing={isMobile ? 1.5 : 2}
             >
-              <Typography variant="body2" color="text.secondary">
-                {products.length} ürün bulundu
-                {filters?.categoryId && (
-                  <span>
-                    {" "}
-                    -{" "}
-                    {categories.find((c: any) => c.id === filters.categoryId)
-                      ?.kategoriAdi ||
-                      categories.find((c: any) => c.id === filters.categoryId)
-                        ?.kategoriAdi}{" "}
-                    kategorisi
-                  </span>
+              <Stack
+                direction={isMobile ? "column" : "row"}
+                alignItems={isMobile ? "flex-start" : "center"}
+                spacing={isMobile ? 1 : 2}
+              >
+                <Typography
+                  variant={isMobile ? "body2" : "body1"}
+                  sx={{
+                    fontWeight: 600,
+                    color: "text.primary",
+                  }}
+                >
+                  {products.length} ürün bulundu
+                </Typography>
+                {(filters?.categoryId || filters?.search) && (
+                  <Stack
+                    direction="row"
+                    spacing={1}
+                    flexWrap="wrap"
+                    sx={{
+                      "& > *": {
+                        mb: isMobile ? 0.5 : 0,
+                      },
+                    }}
+                  >
+                    {filters?.categoryId && (
+                      <Chip
+                        size="small"
+                        label={
+                          categories.find(
+                            (c: any) => c.id === filters.categoryId
+                          )?.kategoriAdi || "Kategori"
+                        }
+                        color="primary"
+                        variant="outlined"
+                        sx={{
+                          borderRadius: 2,
+                          fontSize: isMobile ? "0.7rem" : "0.75rem",
+                        }}
+                      />
+                    )}
+                    {filters?.search && (
+                      <Chip
+                        size="small"
+                        label={`"${
+                          filters.search.length > 10 && isMobile
+                            ? filters.search.substring(0, 10) + "..."
+                            : filters.search
+                        }"`}
+                        color="secondary"
+                        variant="outlined"
+                        sx={{
+                          borderRadius: 2,
+                          fontSize: isMobile ? "0.7rem" : "0.75rem",
+                        }}
+                      />
+                    )}
+                  </Stack>
                 )}
-                {filters?.search && <span> - "{filters.search}" araması</span>}
-              </Typography>
+              </Stack>
               <Stack direction="row" spacing={1} alignItems="center">
                 {isFilterActive && (
-                  <Chip
-                    label="Filtreleri Temizle"
-                    onDelete={handleClearAllFilters}
-                    size="small"
-                    color="secondary"
-                    variant="outlined"
-                  />
+                  <Badge badgeContent={activeFilterCount} color="error">
+                    <Chip
+                      label={isMobile ? "Temizle" : "Filtreleri Temizle"}
+                      onClick={handleClearAllFilters}
+                      size="small"
+                      color="error"
+                      variant="outlined"
+                      icon={<Clear fontSize="small" />}
+                      sx={{
+                        borderRadius: 2,
+                        fontWeight: 500,
+                        fontSize: isMobile ? "0.7rem" : "0.75rem",
+                        "&:hover": {
+                          bgcolor: alpha(theme.palette.error.main, 0.1),
+                        },
+                      }}
+                    />
+                  </Badge>
                 )}
-                <IconButton
-                  onClick={() => setViewMode("grid")}
-                  color={viewMode === "grid" ? "primary" : "default"}
-                  size="small"
-                >
-                  <GridView />
-                </IconButton>
-                <IconButton
-                  onClick={() => setViewMode("list")}
-                  color={viewMode === "list" ? "primary" : "default"}
-                  size="small"
-                >
-                  <ViewList />
-                </IconButton>
+
+                {!isMobile && (
+                  <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
+                )}
+
+                <Stack direction="row" spacing={0.5}>
+                  <IconButton
+                    onClick={() => setViewMode("grid")}
+                    size="small"
+                    sx={{
+                      color:
+                        viewMode === "grid" ? "primary.main" : "text.secondary",
+                      bgcolor:
+                        viewMode === "grid"
+                          ? alpha(theme.palette.primary.main, 0.1)
+                          : "transparent",
+                      borderRadius: 2,
+                      transition: "all 0.2s ease",
+                      p: isMobile ? 0.5 : 1,
+                      "&:hover": {
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                      },
+                    }}
+                  >
+                    <GridView fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => setViewMode("list")}
+                    size="small"
+                    sx={{
+                      color:
+                        viewMode === "list" ? "primary.main" : "text.secondary",
+                      bgcolor:
+                        viewMode === "list"
+                          ? alpha(theme.palette.primary.main, 0.1)
+                          : "transparent",
+                      borderRadius: 2,
+                      transition: "all 0.2s ease",
+                      p: isMobile ? 0.5 : 1,
+                      "&:hover": {
+                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                      },
+                    }}
+                  >
+                    <ViewList fontSize="small" />
+                  </IconButton>
+                </Stack>
               </Stack>
             </Stack>
           </Box>
         </Container>
       </Paper>
-      <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Container
+        maxWidth="xl"
+        sx={{ py: isMobile ? 2 : 4, px: isMobile ? 1 : undefined }}
+      >
         {status === "pendingFetchProducts" ? (
-          <Box display="flex" justifyContent="center" py={8}>
-            <CircularProgress size={40} />
+          <Box display="flex" justifyContent="center" py={isMobile ? 4 : 8}>
+            <CircularProgress size={isMobile ? 32 : 48} thickness={4} />
           </Box>
         ) : (
-          <Box>
-            {products.length > 0 ? (
-              <ProductList products={products} />
-            ) : (
-              <Paper
-                sx={{
-                  p: 8,
-                  textAlign: "center",
-                  bgcolor: "white",
-                  borderRadius: 3,
-                }}
-              >
-                <Typography variant="h6" color="text.secondary" mb={2}>
-                  Aradığınız kriterlere uygun ürün bulunamadı
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Farklı kategoriler veya arama terimleri deneyebilirsiniz
-                </Typography>
-              </Paper>
-            )}
-          </Box>
+          <Fade in timeout={500}>
+            <Box>
+              {products.length > 0 ? (
+                <ProductList products={products} />
+              ) : (
+                <Card
+                  sx={{
+                    p: isMobile ? 3 : 6,
+                    textAlign: "center",
+                    bgcolor: isDark ? "grey.800" : "background.paper",
+                    borderRadius: isMobile ? 3 : 4,
+                    border: `1px solid ${alpha(theme.palette.divider, 0.12)}`,
+                    boxShadow: isDark ? "none" : theme.shadows[2],
+                    mx: isMobile ? 1 : 0,
+                  }}
+                >
+                  <CardContent
+                    sx={{
+                      p: isMobile ? 2 : 3,
+                      "&:last-child": { pb: isMobile ? 2 : 3 },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        mb: isMobile ? 2 : 3,
+                        display: "inline-flex",
+                        p: isMobile ? 2 : 3,
+                        borderRadius: "50%",
+                        bgcolor: alpha(theme.palette.text.secondary, 0.1),
+                      }}
+                    >
+                      <ShoppingBag
+                        sx={{
+                          fontSize: isMobile ? 36 : 48,
+                          color: "text.secondary",
+                        }}
+                      />
+                    </Box>
+                    <Typography
+                      variant={isMobile ? "h6" : "h5"}
+                      sx={{
+                        fontWeight: 600,
+                        color: "text.primary",
+                        mb: isMobile ? 1.5 : 2,
+                      }}
+                    >
+                      Ürün bulunamadı
+                    </Typography>
+                    <Typography
+                      variant={isMobile ? "body2" : "body1"}
+                      color="text.secondary"
+                      sx={{
+                        maxWidth: 400,
+                        mx: "auto",
+                        lineHeight: 1.6,
+                        fontSize: isMobile ? "0.875rem" : "1rem",
+                      }}
+                    >
+                      Aradığınız kriterlere uygun ürün bulunamadı. Farklı
+                      kategoriler veya arama terimleri deneyebilirsiniz.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              )}
+            </Box>
+          </Fade>
         )}
       </Container>
     </Box>

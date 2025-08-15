@@ -35,6 +35,7 @@ import { useAppSelector, useAppDispatch } from "../../../store/store";
 import { addItemToCart } from "../../cart/slices/cartSlice";
 import { selectProductById, fetchProductsById } from "../slices/catalogSlice";
 import ProductReview from "../../review/pages/ProductReview";
+import { toast } from "react-toastify";
 
 export default function ProductDetailsPage() {
   const { cart, status } = useAppSelector((state) => state.cart);
@@ -65,9 +66,7 @@ export default function ProductDetailsPage() {
       </Box>
     );
   }
-
   if (!product) return <NotFound />;
-
   return (
     <>
       <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -164,12 +163,13 @@ export default function ProductDetailsPage() {
                     ${(product.price / 100).toFixed(2)}
                   </Typography>
                   <Chip
-                    label="Stokta"
-                    color="success"
+                    label={product.stock > 0 ? "Stokta" : "Stokta Yok"}
+                    color={product.stock > 0 ? "success" : "error"}
                     icon={<CheckCircle />}
                     sx={{ fontWeight: 600 }}
                   />
                 </Box>
+
                 <Paper
                   elevation={0}
                   sx={{
@@ -271,9 +271,19 @@ export default function ProductDetailsPage() {
                     loadingPosition="start"
                     startIcon={<AddShoppingCart />}
                     loading={status === "pendingAddItem" + product.id}
-                    onClick={() =>
-                      dispatch(addItemToCart({ productId: product.id }))
-                    }
+                    onClick={() => {
+                      if ((item?.quantity ?? 0) >= product.stock) {
+                        toast.error("Ürün Stokta Bulunmuyor");
+                        return;
+                      }
+                      dispatch(
+                        addItemToCart({
+                          productId: product.id,
+                          stock: product.stock,
+                        })
+                      );
+                    }}
+                    disabled={item?.quantity! >= product.stock}
                     sx={{
                       py: 1.5,
                       fontSize: "1.1rem",

@@ -40,7 +40,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     if (!isLoaded) {
-      dispatch(fetchProducts());
+      dispatch(fetchProducts({ showInactive: true }));
       dispatch(fetchCategories());
     }
   }, [dispatch, isLoaded]);
@@ -49,7 +49,7 @@ export default function ProductsPage() {
     if (window.confirm("Ürünü silmek istediğinize emin misiniz?")) {
       dispatch(deleteProduct(id))
         .unwrap()
-        .then(() => dispatch(fetchProducts()));
+        .then(() => dispatch(fetchProducts({ showInactive: true })));
     }
   };
 
@@ -71,11 +71,11 @@ export default function ProductsPage() {
     if (selectedProductId) {
       dispatch(updateProduct(data))
         .unwrap()
-        .then(() => dispatch(fetchProducts()));
+        .then(() => dispatch(fetchProducts({ showInactive: true })));
     } else {
       dispatch(createProduct(data))
         .unwrap()
-        .then(() => dispatch(fetchProducts()));
+        .then(() => dispatch(fetchProducts({ showInactive: true })));
     }
     setOpenForm(false);
   };

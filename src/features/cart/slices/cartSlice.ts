@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { Cart } from "../models/ICart";
 import { cartApi } from "../api/cartApi";
+import { toast } from "react-toastify";
 
 interface CartState {
   cart: Cart | null;
@@ -14,14 +15,32 @@ const initialState: CartState = {
 
 export const addItemToCart = createAsyncThunk<
   Cart,
-  { productId: number; quantity?: number }
->("cart/addItemToCart", async ({ productId, quantity = 1 }) => {
-  try {
-    return await cartApi.addItem(productId, quantity);
-  } catch (error) {
-    console.log(error);
+  { productId: number; quantity?: number; stock: number }
+>(
+  "cart/addItemToCart",
+  async ({ productId, quantity = 1, stock }, { getState, rejectWithValue }) => {
+    try {
+      const state: any = getState();
+      const cart = state.cart.cart;
+
+      const existingItem = cart?.cartItems.find(
+        (item: any) => item.productId === productId
+      );
+      const existingQuantity = existingItem ? existingItem.quantity : 0;
+
+      if (existingQuantity + quantity > stock) {
+        toast.error("Stok miktarına ulaştınız!");
+        return rejectWithValue("Stok yetersiz");
+      }
+
+      const response = await cartApi.addItem(productId, quantity);
+      return response;
+    } catch (error: any) {
+      toast.error("Sepete eklenemedi!");
+      return rejectWithValue(error);
+    }
   }
-});
+);
 
 export const deleteItemFromCart = createAsyncThunk<
   Cart,
@@ -57,37 +76,35 @@ export const cartSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(addItemToCart.pending, (state, action) => {
-      console.log(action);
-      state.status = "pendingAddItem" + action.meta.arg.productId;
-    });
-    builder.addCase(addItemToCart.fulfilled, (state, action) => {
-      state.cart = action.payload;
-      state.status = "idle";
-    });
-    builder.addCase(addItemToCart.rejected, (state) => {
-      state.status = "idle";
-    });
-    builder.addCase(deleteItemFromCart.pending, (state, action) => {
-      console.log(action);
-      state.status =
-        "pendingDeleteItem" + action.meta.arg.productId + action.meta.arg.key;
-    });
-    builder.addCase(deleteItemFromCart.fulfilled, (state, action) => {
-      state.cart = action.payload;
-      state.status = "idle";
-    });
-    builder.addCase(deleteItemFromCart.rejected, (state) => {
-      state.status = "idle";
-    });
-    builder.addCase(getCart.fulfilled, (state, action) => {
-      state.cart = action.payload;
-      state.status = "idle";
-    });
-    builder.addCase(getCart.rejected, (state, action) => {
-      console.log(action.payload);
-      state.status = "idle";
-    });
+    builder
+      .addCase(addItemToCart.pending, (state, action) => {
+        state.status = "pendingAddItem" + action.meta.arg.productId;
+      })
+      .addCase(addItemToCart.fulfilled, (state, action) => {
+        state.cart = action.payload;
+        state.status = "idle";
+      })
+      .addCase(addItemToCart.rejected, (state) => {
+        state.status = "idle"; // loading kapanıyor
+      })
+      .addCase(deleteItemFromCart.pending, (state, action) => {
+        state.status =
+          "pendingDeleteItem" + action.meta.arg.productId + action.meta.arg.key;
+      })
+      .addCase(deleteItemFromCart.fulfilled, (state, action) => {
+        state.cart = action.payload;
+        state.status = "idle";
+      })
+      .addCase(deleteItemFromCart.rejected, (state) => {
+        state.status = "idle";
+      })
+      .addCase(getCart.fulfilled, (state, action) => {
+        state.cart = action.payload;
+        state.status = "idle";
+      })
+      .addCase(getCart.rejected, (state) => {
+        state.status = "idle";
+      });
   },
 });
 

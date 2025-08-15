@@ -15,6 +15,7 @@ export interface ProductFilters {
   search?: string;
   page?: number;
   pageSize?: number;
+  showInactive?: boolean;
 }
 
 export const fetchProducts = createAsyncThunk<

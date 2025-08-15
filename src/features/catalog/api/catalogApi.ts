@@ -3,7 +3,7 @@ import axiosClient from "../../../shared/api/axiosClient";
 import type { ProductFilters } from "../slices/catalogSlice";
 
 export const catalogApi = {
-  list: (filters?: ProductFilters) => {
+  list: (filters?: ProductFilters & { showInactive?: boolean }) => {
     const params: Record<string, any> = {};
 
     if (filters?.categoryId) {
@@ -18,6 +18,8 @@ export const catalogApi = {
     if (filters?.pageSize) {
       params.pageSize = filters.pageSize;
     }
+    if (filters?.showInactive !== undefined)
+      params.showInactive = filters.showInactive;
 
     return axiosClient.get("products", { params }).then((res) => {
       if (res.data.products) {

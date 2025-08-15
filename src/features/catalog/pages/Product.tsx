@@ -7,7 +7,6 @@ import {
   Link,
   Typography,
 } from "@mui/material";
-
 import {
   AddShoppingCart,
   Favorite,
@@ -15,7 +14,6 @@ import {
   Search,
 } from "@mui/icons-material";
 import { LoadingButton } from "@mui/lab";
-
 import { useAppSelector, useAppDispatch } from "../../../store/store";
 import { addItemToCart } from "../../cart/slices/cartSlice";
 import {
@@ -30,7 +28,7 @@ interface Props {
 }
 
 export default function Product({ product }: Props) {
-  const { status } = useAppSelector((state) => state.cart);
+  const { status, cart } = useAppSelector((state) => state.cart);
   const dispatch = useAppDispatch();
   const favorities = useAppSelector(selectAllFavorities);
   const isFavorited = favorities.some((fav) => fav.productId === product.id);
@@ -45,6 +43,14 @@ export default function Product({ product }: Props) {
       dispatch(createFavorities({ productId: product.id }));
     }
   };
+
+  const existingItem = cart?.cartItems.find(
+    (item) => item.productId === product.id
+  );
+  const existingQuantity = existingItem ? existingItem.quantity : 0;
+
+  const isDisabled = existingQuantity >= product.stock;
+
   return (
     <Card
       sx={{
@@ -84,17 +90,21 @@ export default function Product({ product }: Props) {
           variant="contained"
           size="medium"
           startIcon={<AddShoppingCart />}
-          onClick={() => dispatch(addItemToCart({ productId: product.id }))}
+          onClick={() =>
+            dispatch(
+              addItemToCart({ productId: product.id, stock: product.stock })
+            )
+          }
           sx={{ flexGrow: 1, mr: 1 }}
+          disabled={isDisabled}
         >
-          Sepete Ekle
+          {isDisabled ? "Stok Yetersiz" : "Sepete Ekle"}
         </LoadingButton>
 
         <IconButton
           aria-label="favorite"
           onClick={handleFavoriteToggle}
           color={isFavorited ? "error" : "default"}
-          sx={{ transition: "color 0.2s, transform 0.2s" }}
         >
           {isFavorited ? <Favorite /> : <FavoriteBorder />}
         </IconButton>
