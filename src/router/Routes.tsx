@@ -21,6 +21,9 @@ import LoginPage from "../features/account/pages/LoginPage";
 import AdminLayout from "../features/admin/pages/AdminLayout";
 import OrdersPage from "../features/admin/pages/OrdersPage";
 import ReviewPage from "../features/review/pages/ReviewTestPage";
+import MyAccount from "../features/myaccount/pages/MyAccountLayout";
+import ChangePassword from "../features/myaccount/pages/ChangePassword";
+import UpdateUser from "../features/myaccount/pages/UpdateUser";
 
 export const router = createBrowserRouter([
   {
@@ -37,6 +40,14 @@ export const router = createBrowserRouter([
       { path: "register", element: <RegisterPage /> },
       { path: "favorities", element: <FavoritePage /> },
       { path: "review", element: <ReviewPage /> },
+      {
+        path: "myaccount",
+        element: <MyAccount />,
+        children: [
+          { path: "password", element: <ChangePassword /> },
+          { path: "profile", element: <UpdateUser /> },
+        ],
+      },
       {
         element: <AuthGuard />,
         children: [

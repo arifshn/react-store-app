@@ -34,7 +34,17 @@ import PhoneIcon from "@mui/icons-material/Phone";
 import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import { ordersApi } from "../api/ordersApi";
 
-const orderStatus = ["Pending", "Approved", "PaymentFailed", "Completed"];
+const statusMap: Record<
+  string,
+  { label: string; color: "default" | "primary" | "success" | "error" }
+> = {
+  pending: { label: "Beklemede", color: "default" },
+  Approved: { label: "Onaylandı", color: "success" },
+  Preparing: { label: "Hazırlanıyor", color: "success" },
+  Shipped: { label: "Kargoya Verildi", color: "success" },
+  PaymentFailed: { label: "Ödeme Hatası", color: "error" },
+  Completed: { label: "Tamamlandı", color: "primary" },
+};
 
 const statusColors = {
   0: { color: "warning", label: "Beklemede" },
@@ -102,7 +112,6 @@ export default function OrderList() {
         </Typography>
       </Box>
 
-      {/* --- Masaüstü Görünümü --- */}
       <Box sx={{ display: { xs: "none", md: "block" } }}>
         <TableContainer
           component={Paper}
@@ -145,15 +154,9 @@ export default function OrderList() {
                   <TableCell>
                     <Chip
                       label={
-                        statusColors[
-                          order.orderStatus as keyof typeof statusColors
-                        ].label
+                        statusMap[order.orderStatus]?.label || "Bilinmiyor"
                       }
-                      color={
-                        statusColors[
-                          order.orderStatus as keyof typeof statusColors
-                        ].color as any
-                      }
+                      color={statusMap[order.orderStatus]?.color || "default"}
                       size="small"
                       variant="outlined"
                     />
@@ -189,7 +192,6 @@ export default function OrderList() {
         </TableContainer>
       </Box>
 
-      {/* --- Mobil Görünümü --- */}
       <Box sx={{ display: { xs: "block", md: "none" } }}>
         {orders?.map((order) => (
           <Card
@@ -222,14 +224,8 @@ export default function OrderList() {
                   </Typography>
                 </Box>
                 <Chip
-                  label={
-                    statusColors[order.orderStatus as keyof typeof statusColors]
-                      .label
-                  }
-                  color={
-                    statusColors[order.orderStatus as keyof typeof statusColors]
-                      .color as any
-                  }
+                  label={statusMap[order.orderStatus]?.label || "Bilinmiyor"}
+                  color={statusMap[order.orderStatus]?.color || "default"}
                   size="small"
                   variant="outlined"
                 />
@@ -264,7 +260,6 @@ export default function OrderList() {
         ))}
       </Box>
 
-      {/* --- Sipariş Detayları Dialog'u --- */}
       <Dialog
         onClose={handleDialogClose}
         open={open}
@@ -309,7 +304,6 @@ export default function OrderList() {
               mb: 3,
             }}
           >
-            {/* Teslimat Bilgileri */}
             <Box sx={{ flex: 1 }}>
               <Card sx={{ height: "100%" }}>
                 <CardContent>
@@ -357,7 +351,6 @@ export default function OrderList() {
                 </CardContent>
               </Card>
             </Box>
-            {/* Sipariş Özeti */}
             <Box sx={{ flex: 1 }}>
               <Card sx={{ height: "100%" }}>
                 <CardContent>
@@ -399,7 +392,6 @@ export default function OrderList() {
               </Card>
             </Box>
           </Box>
-          {/* Ürün Listesi */}
           <Box sx={{ overflowX: "auto" }}>
             <Typography
               variant="h6"

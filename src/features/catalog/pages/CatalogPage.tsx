@@ -13,22 +13,13 @@ import {
   Card,
   CardContent,
   Fade,
-  Skeleton,
   Divider,
   Badge,
   useTheme,
   alpha,
   useMediaQuery,
 } from "@mui/material";
-import {
-  Search,
-  Clear,
-  GridView,
-  ViewList,
-  FilterList,
-  ShoppingBag,
-  Inventory,
-} from "@mui/icons-material";
+import { Search, Clear, ShoppingBag, Inventory } from "@mui/icons-material";
 import { useAppSelector, useAppDispatch } from "../../../store/store";
 import ProductList from "./ProductList";
 import {
@@ -48,7 +39,6 @@ export default function CatalogPage() {
   const theme = useTheme();
   const isDark = theme.palette.mode === "dark";
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const { user } = useAppSelector((state) => state.account);
 
   const products = useAppSelector(selectAllProducts);
@@ -61,7 +51,6 @@ export default function CatalogPage() {
   const dispatch = useAppDispatch();
 
   const [searchInput, setSearchInput] = useState(filters?.search || "");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
   useEffect(() => {
     if (user?.token) {
@@ -306,7 +295,6 @@ export default function CatalogPage() {
                 <Search fontSize={isMobile ? "small" : "medium"} />
               </IconButton>
             </Stack>
-
             <Stack
               direction="row"
               spacing={isMobile ? 1 : 1.5}
@@ -379,7 +367,6 @@ export default function CatalogPage() {
             </Stack>
 
             <Divider sx={{ mb: 2, opacity: 0.6 }} />
-
             <Stack
               direction={isMobile ? "column" : "row"}
               justifyContent="space-between"
@@ -446,75 +433,26 @@ export default function CatalogPage() {
                   </Stack>
                 )}
               </Stack>
-              <Stack direction="row" spacing={1} alignItems="center">
-                {isFilterActive && (
-                  <Badge badgeContent={activeFilterCount} color="error">
-                    <Chip
-                      label={isMobile ? "Temizle" : "Filtreleri Temizle"}
-                      onClick={handleClearAllFilters}
-                      size="small"
-                      color="error"
-                      variant="outlined"
-                      icon={<Clear fontSize="small" />}
-                      sx={{
-                        borderRadius: 2,
-                        fontWeight: 500,
-                        fontSize: isMobile ? "0.7rem" : "0.75rem",
-                        "&:hover": {
-                          bgcolor: alpha(theme.palette.error.main, 0.1),
-                        },
-                      }}
-                    />
-                  </Badge>
-                )}
-
-                {!isMobile && (
-                  <Divider orientation="vertical" flexItem sx={{ mx: 1 }} />
-                )}
-
-                <Stack direction="row" spacing={0.5}>
-                  <IconButton
-                    onClick={() => setViewMode("grid")}
+              {isFilterActive && (
+                <Badge badgeContent={activeFilterCount} color="error">
+                  <Chip
+                    label={isMobile ? "Temizle" : "Filtreleri Temizle"}
+                    onClick={handleClearAllFilters}
                     size="small"
+                    color="error"
+                    variant="outlined"
+                    icon={<Clear fontSize="small" />}
                     sx={{
-                      color:
-                        viewMode === "grid" ? "primary.main" : "text.secondary",
-                      bgcolor:
-                        viewMode === "grid"
-                          ? alpha(theme.palette.primary.main, 0.1)
-                          : "transparent",
                       borderRadius: 2,
-                      transition: "all 0.2s ease",
-                      p: isMobile ? 0.5 : 1,
+                      fontWeight: 500,
+                      fontSize: isMobile ? "0.7rem" : "0.75rem",
                       "&:hover": {
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
+                        bgcolor: alpha(theme.palette.error.main, 0.1),
                       },
                     }}
-                  >
-                    <GridView fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    onClick={() => setViewMode("list")}
-                    size="small"
-                    sx={{
-                      color:
-                        viewMode === "list" ? "primary.main" : "text.secondary",
-                      bgcolor:
-                        viewMode === "list"
-                          ? alpha(theme.palette.primary.main, 0.1)
-                          : "transparent",
-                      borderRadius: 2,
-                      transition: "all 0.2s ease",
-                      p: isMobile ? 0.5 : 1,
-                      "&:hover": {
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                      },
-                    }}
-                  >
-                    <ViewList fontSize="small" />
-                  </IconButton>
-                </Stack>
-              </Stack>
+                  />
+                </Badge>
+              )}
             </Stack>
           </Box>
         </Container>

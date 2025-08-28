@@ -10,6 +10,9 @@ import {
   Skeleton,
   IconButton,
   Chip,
+  CardMedia,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import {
   Delete as DeleteIcon,
@@ -29,6 +32,9 @@ import {
 } from "../../favorite/slices/favoriteSlice";
 
 const FavoritePage: React.FC = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isTablet = useMediaQuery(theme.breakpoints.down("md"));
   const dispatch = useAppDispatch();
   const favorities = useAppSelector(selectAllFavorities);
   const products = useAppSelector(selectAllProducts);
@@ -135,7 +141,20 @@ const FavoritePage: React.FC = () => {
                   }}
                 >
                   <Typography variant="body2" color="text.secondary">
-                    Ürün Görseli
+                    <CardMedia
+                      component="img"
+                      height={isMobile ? 140 : isTablet ? 160 : 200}
+                      image={`http://localhost:5163/images/${product.imageUrl}`}
+                      alt={product.name}
+                      sx={{
+                        objectFit: "contain",
+                        p: isMobile ? 1 : 2,
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                        (window.location.href = `/catalog/${product.id}`)
+                      }
+                    />
                   </Typography>
                   <IconButton
                     sx={{

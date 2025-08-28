@@ -20,15 +20,13 @@ function App() {
   const mode = useAppSelector((state) => state.theme.mode);
   const dispatch = useAppDispatch();
   const [loading, setLoading] = useState(true);
-
   const theme = createTheme({
     palette: {
       mode,
     },
   });
-
   const handleThemeChange = () => {
-    dispatch(toggleTheme()); // veya theme slice'ındaki action'ı kullan
+    dispatch(toggleTheme());
   };
   const initApp = async () => {
     await dispatch(getUser());
@@ -50,7 +48,7 @@ function App() {
           gap: 2,
         }}
       >
-        <CircularProgress size={60} color="secondary" />
+        <CircularProgress size={60} color="primary" />
         <Typography variant="h5" color="text.secondary">
           Yükleniyor...
         </Typography>

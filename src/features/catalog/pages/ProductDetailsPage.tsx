@@ -36,6 +36,7 @@ import { addItemToCart } from "../../cart/slices/cartSlice";
 import { selectProductById, fetchProductsById } from "../slices/catalogSlice";
 import ProductReview from "../../review/pages/ProductReview";
 import { toast } from "react-toastify";
+import { currencyTRY } from "../../../utils/formatCurrency";
 
 export default function ProductDetailsPage() {
   const { cart, status } = useAppSelector((state) => state.cart);
@@ -160,7 +161,7 @@ export default function ProductDetailsPage() {
                       fontWeight: 600,
                     }}
                   >
-                    ${(product.price / 100).toFixed(2)}
+                    {currencyTRY.format(product.price)}
                   </Typography>
                   <Chip
                     label={product.stock > 0 ? "Stokta" : "Stokta Yok"}

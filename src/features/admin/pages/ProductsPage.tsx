@@ -16,6 +16,11 @@ import {
   Button,
   Divider,
   Typography,
+  Chip,
+  Skeleton,
+  Alert,
+  Snackbar,
+  Fab,
 } from "@mui/material";
 import ProductForm from "./ProductForm";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -25,6 +30,10 @@ import {
 } from "../../categories/slices/categoriesSlice";
 import type { IProduct } from "../../catalog/models/IProduct";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 export default function ProductsPage() {
   const dispatch = useAppDispatch();
@@ -37,6 +46,15 @@ export default function ProductsPage() {
   const [selectedProductId, setSelectedProductId] = useState<number | null>(
     null
   );
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   useEffect(() => {
     if (!isLoaded) {
@@ -45,11 +63,30 @@ export default function ProductsPage() {
     }
   }, [dispatch, isLoaded]);
 
+  const showSnackbar = (message: string, severity: "success" | "error") => {
+    setSnackbar({ open: true, message, severity });
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar((prev) => ({ ...prev, open: false }));
+  };
+
+  const handleRefresh = () => {
+    dispatch(fetchProducts({ showInactive: true }));
+    showSnackbar("Ürünler yenilendi", "success");
+  };
+
   const handleDelete = (id: number) => {
     if (window.confirm("Ürünü silmek istediğinize emin misiniz?")) {
       dispatch(deleteProduct(id))
         .unwrap()
-        .then(() => dispatch(fetchProducts({ showInactive: true })));
+        .then(() => {
+          dispatch(fetchProducts({ showInactive: true }));
+          showSnackbar("Ürün başarıyla silindi", "success");
+        })
+        .catch(() => {
+          showSnackbar("Ürün silinirken hata oluştu", "error");
+        });
     }
   };
 
@@ -68,44 +105,92 @@ export default function ProductsPage() {
   };
 
   const handleSubmitForm = (data: any) => {
-    if (selectedProductId) {
-      dispatch(updateProduct(data))
-        .unwrap()
-        .then(() => dispatch(fetchProducts({ showInactive: true })));
-    } else {
-      dispatch(createProduct(data))
-        .unwrap()
-        .then(() => dispatch(fetchProducts({ showInactive: true })));
-    }
+    const action = selectedProductId
+      ? updateProduct(data)
+      : createProduct(data);
+    const successMessage = selectedProductId
+      ? "Ürün başarıyla güncellendi"
+      : "Ürün başarıyla eklendi";
+
+    dispatch(action)
+      .unwrap()
+      .then(() => {
+        dispatch(fetchProducts({ showInactive: true }));
+        showSnackbar(successMessage, "success");
+      })
+      .catch(() => {
+        showSnackbar("İşlem sırasında hata oluştu", "error");
+      });
     setOpenForm(false);
   };
 
   const columns: GridColDef<IProduct>[] = [
     { field: "id", headerName: "ID", width: 90 },
     { field: "name", headerName: "Ürün Adı", width: 200 },
-    { field: "price", headerName: "Fiyat", width: 120 },
+    {
+      field: "price",
+      headerName: "Fiyat",
+      width: 120,
+      renderCell: (params) => (
+        <Typography variant="body2" fontWeight="medium">
+          {params.value} TL
+        </Typography>
+      ),
+    },
     { field: "stock", headerName: "Stok", width: 120 },
     { field: "description", headerName: "Açıklama", width: 120 },
     { field: "imageUrl", headerName: "Görsel", width: 120 },
-    { field: "isActive", headerName: "Aktif", width: 120 },
+    {
+      field: "isActive",
+      headerName: "Durum",
+      width: 120,
+      renderCell: (params) => (
+        <Chip
+          label={params.value ? "Aktif" : "Pasif"}
+          size="small"
+          color={params.value ? "success" : "error"}
+          variant="outlined"
+        />
+      ),
+    },
     {
       field: "category",
       headerName: "Kategori",
       width: 150,
-      renderCell: (params) => params.value?.kategoriAdi ?? "Belirtilmemiş",
+      renderCell: (params) => (
+        <Chip
+          label={params.value?.kategoriAdi ?? "Kategori yok"}
+          size="small"
+          variant="outlined"
+          color="default"
+        />
+      ),
     },
     {
       field: "actions",
       headerName: "İşlemler",
       renderCell: (params) => (
-        <>
-          <Button onClick={() => handleOpenEdit(params.row.id)}>Düzenle</Button>
-          <Button color="error" onClick={() => handleDelete(params.row.id)}>
+        <Box sx={{ display: "flex", gap: 1 }}>
+          <Button
+            size="small"
+            variant="contained"
+            startIcon={<EditIcon />}
+            onClick={() => handleOpenEdit(params.row.id)}
+          >
+            Düzenle
+          </Button>
+          <Button
+            size="small"
+            variant="outlined"
+            color="error"
+            startIcon={<DeleteIcon />}
+            onClick={() => handleDelete(params.row.id)}
+          >
             Sil
           </Button>
-        </>
+        </Box>
       ),
-      width: 250,
+      width: 280,
     },
   ];
 
@@ -113,30 +198,116 @@ export default function ProductsPage() {
     (product) => product.id !== null && product.id !== undefined
   );
 
+  const isLoading = status === "pendingFetchProducts";
+
+  const MobileSkeleton = () => (
+    <Box sx={{ display: { xs: "block", md: "none" } }}>
+      {[1, 2, 3].map((i) => (
+        <Box
+          key={i}
+          sx={{
+            mb: 2,
+            p: 2,
+            borderRadius: 2,
+            border: 1,
+            borderColor: "divider",
+          }}
+        >
+          <Skeleton variant="text" width="60%" height={24} />
+          <Skeleton variant="text" width="40%" height={16} sx={{ mb: 1 }} />
+          <Skeleton
+            variant="rectangular"
+            width="100%"
+            height={80}
+            sx={{ borderRadius: 1 }}
+          />
+        </Box>
+      ))}
+    </Box>
+  );
+
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: { xs: 1, sm: 2 }, pb: { xs: 10, md: 2 } }}>
       <Box
         sx={{
           display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          alignItems: "center",
-          mb: 2,
+          alignItems: { xs: "stretch", sm: "center" },
+          gap: 2,
+          mb: 3,
         }}
       >
-        <Typography variant="h4" component="h1" fontWeight="bold">
-          Ürün Listesi
-        </Typography>
-        <Button variant="contained" onClick={handleOpenCreate} size="large">
+        <Box>
+          <Typography
+            variant="h4"
+            component="h1"
+            fontWeight="bold"
+            sx={{
+              fontSize: { xs: "1.5rem", sm: "2rem", md: "2.125rem" },
+              mb: { xs: 0, sm: 0 },
+            }}
+          >
+            Ürün Listesi
+          </Typography>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ display: { xs: "block", sm: "none" } }}
+          >
+            {validProducts.length} ürün bulundu
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: { xs: "none", sm: "flex" }, gap: 1 }}>
+          <Button
+            variant="outlined"
+            startIcon={<RefreshIcon />}
+            onClick={handleRefresh}
+            disabled={isLoading}
+            sx={{ minHeight: 48 }}
+          >
+            Yenile
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<AddIcon />}
+            onClick={handleOpenCreate}
+            size="large"
+            sx={{ minHeight: 48, minWidth: 160 }}
+          >
+            Yeni Ürün Ekle
+          </Button>
+        </Box>
+
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={handleOpenCreate}
+          sx={{
+            display: { xs: "flex", sm: "none" },
+            minHeight: 48,
+            borderRadius: 2,
+            width: "100%",
+          }}
+        >
           Yeni Ürün Ekle
         </Button>
       </Box>
-
       <Box sx={{ display: { xs: "none", md: "block" } }}>
-        <Paper style={{ height: 600, width: "100%", padding: 16 }}>
+        <Paper
+          elevation={2}
+          sx={{
+            height: 600,
+            width: "100%",
+            p: 2,
+            borderRadius: 2,
+          }}
+        >
           <DataGrid
             rows={validProducts}
             columns={columns}
-            loading={status === "pendingFetchProducts"}
+            loading={isLoading}
             getRowId={(row) => row.id}
             pageSizeOptions={[10, 25, 50]}
             paginationModel={{ pageSize: 10, page: 0 }}
@@ -146,94 +317,216 @@ export default function ProductsPage() {
                 backgroundColor: "background.default",
                 fontWeight: "bold",
               },
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "action.hover",
+              },
             }}
           />
         </Paper>
       </Box>
 
       <Box sx={{ display: { xs: "block", md: "none" } }}>
-        {validProducts.map((product) => (
-          <Accordion
-            key={product.id}
+        {isLoading ? (
+          <MobileSkeleton />
+        ) : validProducts.length === 0 ? (
+          <Box
             sx={{
-              mb: 2,
-              borderRadius: 2,
-              boxShadow: 1,
-              "&.Mui-expanded": {
-                boxShadow: 3,
-              },
+              textAlign: "center",
+              py: 8,
+              px: 2,
             }}
           >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls={`panel-${product.id}-content`}
-              id={`panel-${product.id}-header`}
+            <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+              Henüz ürün bulunmuyor
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              İlk ürününüzü ekleyerek başlayabilirsiniz
+            </Typography>
+            <Button
+              variant="contained"
+              size="large"
+              startIcon={<AddIcon />}
+              onClick={handleOpenCreate}
+              sx={{ minHeight: 48, minWidth: 200 }}
             >
-              <Box>
-                <Typography variant="subtitle1" fontWeight="bold">
-                  {product.name}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  ID: #{product.id}
-                </Typography>
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Box sx={{ mb: 2, display: "grid", gap: 1 }}>
-                <Typography variant="body2">
-                  <Box component="span" fontWeight="bold">
-                    Fiyat:
-                  </Box>{" "}
-                  {product.price} TL
-                </Typography>
-                <Typography variant="body2">
-                  <Box component="span" fontWeight="bold">
-                    Stok:
-                  </Box>{" "}
-                  {product.stock}
-                </Typography>
-                <Typography variant="body2">
-                  <Box component="span" fontWeight="bold">
-                    Açıklama:
-                  </Box>{" "}
-                  {product.description}
-                </Typography>
-                <Typography variant="body2">
-                  <Box component="span" fontWeight="bold">
-                    Kategori:
-                  </Box>{" "}
-                  {product.category?.kategoriAdi ?? "Belirtilmemiş"}
-                </Typography>
-                <Typography variant="body2">
-                  <Box component="span" fontWeight="bold">
-                    Aktif:
-                  </Box>{" "}
-                  {product.isActive ? "Evet" : "Hayır"}
-                </Typography>
-              </Box>
-              <Divider />
-              <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                <Button
-                  variant="contained"
-                  size="small"
-                  color="primary"
-                  onClick={() => handleOpenEdit(product.id)}
+              İlk Ürününüzü Ekleyin
+            </Button>
+          </Box>
+        ) : (
+          validProducts.map((product) => (
+            <Accordion
+              key={product.id}
+              sx={{
+                mb: 2,
+                borderRadius: 2,
+                boxShadow: 1,
+                border: 1,
+                borderColor: "divider",
+                "&:before": { display: "none" },
+                "&.Mui-expanded": {
+                  boxShadow: 3,
+                  borderColor: "primary.main",
+                },
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                sx={{
+                  minHeight: 72,
+                  px: 2,
+                  py: 1,
+                  "&.Mui-expanded": {
+                    minHeight: 72,
+                    borderBottom: 1,
+                    borderColor: "divider",
+                  },
+                }}
+              >
+                <Box sx={{ width: "100%", pr: 1 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      mb: 0.5,
+                    }}
+                  >
+                    <Box sx={{ flex: 1 }}>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="bold"
+                        sx={{
+                          lineHeight: 1.2,
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: 1,
+                          overflow: "hidden",
+                        }}
+                      >
+                        {product.name}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        #{product.id} • {product.price} TL
+                      </Typography>
+                    </Box>
+                    <Chip
+                      label={product.isActive ? "Aktif" : "Pasif"}
+                      size="small"
+                      color={product.isActive ? "success" : "error"}
+                      variant="outlined"
+                      sx={{ ml: 1 }}
+                    />
+                  </Box>
+                  <Box sx={{ display: "flex", gap: 2 }}>
+                    <Typography variant="caption" color="text.secondary">
+                      Stok: <strong>{product.stock}</strong>
+                    </Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {product.category?.kategoriAdi ?? "Kategori yok"}
+                    </Typography>
+                  </Box>
+                </Box>
+              </AccordionSummary>
+
+              <AccordionDetails sx={{ pt: 2 }}>
+                <Box sx={{ mb: 3 }}>
+                  <Box sx={{ mb: 2 }}>
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      gutterBottom
+                    >
+                      <strong>Açıklama:</strong>
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        backgroundColor: "grey.50",
+                        p: 1.5,
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "grey.200",
+                      }}
+                    >
+                      {product.description || "Açıklama bulunmuyor"}
+                    </Typography>
+                  </Box>
+
+                  {product.imageUrl && (
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        gutterBottom
+                      >
+                        <strong>Görsel:</strong>
+                      </Typography>
+                      <Typography
+                        variant="body2"
+                        color="primary.main"
+                        sx={{ wordBreak: "break-all" }}
+                      >
+                        {product.imageUrl}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    flexDirection: { xs: "column", sm: "row" },
+                  }}
                 >
-                  Düzenle
-                </Button>
-                <Button
-                  variant="contained"
-                  size="small"
-                  color="error"
-                  onClick={() => handleDelete(product.id)}
-                >
-                  Sil
-                </Button>
-              </Box>
-            </AccordionDetails>
-          </Accordion>
-        ))}
+                  <Button
+                    variant="contained"
+                    startIcon={<EditIcon />}
+                    onClick={() => handleOpenEdit(product.id)}
+                    sx={{
+                      minHeight: 48,
+                      width: { xs: "100%", sm: "auto" },
+                      flex: { sm: 1 },
+                    }}
+                  >
+                    Düzenle
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    startIcon={<DeleteIcon />}
+                    onClick={() => handleDelete(product.id)}
+                    sx={{
+                      minHeight: 48,
+                      width: { xs: "100%", sm: "auto" },
+                      flex: { sm: 1 },
+                    }}
+                  >
+                    Sil
+                  </Button>
+                </Box>
+              </AccordionDetails>
+            </Accordion>
+          ))
+        )}
       </Box>
+
+      <Fab
+        color="primary"
+        aria-label="add product"
+        onClick={handleOpenCreate}
+        sx={{
+          position: "fixed",
+          bottom: { xs: 24, sm: 32 },
+          right: { xs: 24, sm: 32 },
+          display: { xs: "flex", sm: "none" },
+          zIndex: 1000,
+        }}
+      >
+        <AddIcon />
+      </Fab>
 
       {openForm && (
         <ProductForm
@@ -242,6 +535,22 @@ export default function ProductsPage() {
           onSubmit={handleSubmitForm}
         />
       )}
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
