@@ -8,27 +8,31 @@ export default function CartSummary() {
       (toplam, item) => toplam + item.quantity * item.price,
       0
     ) ?? 0;
-  const tax = subTotal * 0.2;
-  const total = subTotal + tax;
+
+  const deliveryFee = subTotal >= 500 ? 0 : 29.9;
+  const total = subTotal + deliveryFee;
+
   return (
     <>
       <TableRow>
         <TableCell align="center" colSpan={5}>
           Ara Toplam
         </TableCell>
-        <TableCell align="center">{subTotal}</TableCell>
+        <TableCell align="center">{subTotal.toFixed(2)} ₺</TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="center" colSpan={5}>
-          Vergi (%20)
+          Kargo Ücreti
         </TableCell>
-        <TableCell align="center">{tax}</TableCell>
+        <TableCell align="center">
+          {deliveryFee === 0 ? "Ücretsiz" : `${deliveryFee.toFixed(2)} ₺`}
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell align="center" colSpan={5}>
           Toplam
         </TableCell>
-        <TableCell align="center">{total}</TableCell>
+        <TableCell align="center">{total.toFixed(2)} ₺</TableCell>
       </TableRow>
     </>
   );

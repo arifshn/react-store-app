@@ -22,24 +22,39 @@ export const fetchOrderById = createAsyncThunk<Order, number>(
   }
 );
 
-const orderAdapter = createEntityAdapter<Order>();
-const initialState = orderAdapter.getInitialState({
-  status: "idle",
-  isLoaded: false,
-  selectedOrder: null as Order | null,
-});
-
 export const createOrder = createAsyncThunk<Order, FieldValues>(
-  "order/CreateOrder",
+  "order/createOrder",
   async (data, { rejectWithValue }) => {
     try {
-      console.log(data);
       return await ordersApi.createOrder(data);
     } catch (error: any) {
       return rejectWithValue({ error: error.data });
     }
   }
 );
+
+export const updateOrderStatus = createAsyncThunk<
+  { id: number; status: number },
+  { orderId: number; status: number }
+>(
+  "order/updateOrderStatus",
+  async ({ orderId, status }, { rejectWithValue }) => {
+    try {
+      await ordersApi.updateOrderStatus(orderId, status);
+      return { id: orderId, status };
+    } catch (error: any) {
+      return rejectWithValue({ error: error.data });
+    }
+  }
+);
+
+const orderAdapter = createEntityAdapter<Order>();
+
+const initialState = orderAdapter.getInitialState({
+  status: "idle",
+  isLoaded: false,
+  selectedOrder: null as Order | null,
+});
 
 export const orderSlice = createSlice({
   name: "order",
@@ -61,6 +76,7 @@ export const orderSlice = createSlice({
     builder.addCase(fetchOrders.rejected, (state) => {
       state.status = "idle";
     });
+
     builder.addCase(fetchOrderById.pending, (state) => {
       state.status = "pendingFetchOrderById";
     });
@@ -71,8 +87,17 @@ export const orderSlice = createSlice({
     builder.addCase(fetchOrderById.rejected, (state) => {
       state.status = "idle";
     });
+
     builder.addCase(createOrder.fulfilled, (state, action) => {
       orderAdapter.addOne(state, action.payload);
+    });
+
+    builder.addCase(updateOrderStatus.fulfilled, (state, action) => {
+      const { id, status } = action.payload;
+      const existingOrder = state.entities[id];
+      if (existingOrder) {
+        existingOrder.orderStatus = status;
+      }
     });
   },
 });
@@ -81,5 +106,9 @@ export const {
   selectById: selectOrderById,
   selectIds: selectOrderIds,
   selectAll: selectAllOrder,
-  selectTotal: selecetTotalOrder,
+  selectTotal: selectTotalOrder,
 } = orderAdapter.getSelectors((state: RootState) => state.order);
+
+export const { clearSelectedOrder } = orderSlice.actions;
+
+export default orderSlice;

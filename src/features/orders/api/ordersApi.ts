@@ -6,4 +6,7 @@ export const ordersApi = {
     axiosClient.get(`orders/${id}`).then((res) => res.data),
   createOrder: (formData: any) =>
     axiosClient.post("orders", formData).then((res) => res.data),
+
+  updateOrderStatus: (orderId: number, status: number) =>
+    axiosClient.put(`orders/${orderId}/status`, status),
 };
